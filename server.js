@@ -35,6 +35,8 @@ app.use(passport.initialize());
 app.use(passport.session());
 require('./config/passport.js')(passport);
 
+app.public('static');
+
 //Creating and querying the postgres database
 require('./createQuery.js');
 var stringA = require('./query.js');
