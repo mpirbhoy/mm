@@ -1,0 +1,118 @@
+<% include ../partials/head %>
+
+<body>
+
+<% include ../partials/nav_logged_in %>
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-3 sidebar">
+            <div class="input-group input-group-md">
+                <span class="input-group-addon"><i class="glyphicon glyphicon-search"></i></span>
+                <select class="select2 form-control" style="width: 100%"></select>
+            </div>
+
+            <!-- List of Classes -->
+            <div class="list-group" style="margin-top: 20px">
+                <form id="courses">
+                </form>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE OF THE PAGE -->
+        <div class="col-sm-9 col-sm-offset-3 col-md-9 col-md-offset-3 main" style="margin-top: 50px;">
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        <!-- Load all the courses into HTML -->
+        courses = <%- courses %>;
+        for (var i = 0; i < courses.length; i++) {
+            $('#courses').prepend("<button type='submit' class='list-group-item' value=" + courses[i].courseCode + "><span id='close'>x</span>  " + courses[i].courseCode + ": " + courses[i].courseName + "</button>");
+        };
+
+        <!-- search courses -->
+        var $eventSelect = $(".select2");
+        $eventSelect.on("select2:select", function (e) { log("select2:select", e); });
+
+        function log (name, evt) {
+            if (!evt) {
+                var args = "{}";
+            } else {
+                var args = JSON.stringify(evt.params, function (key, value) {
+                    if (value && value.nodeName) return "[DOM node]";
+                    if (value instanceof $.Event) return "[$.Event]";
+                    return value;
+                });
+            }
+            var $email = $('#user-nav').attr('href');
+
+            var courseCode = JSON.parse(args).data['courseCode'];
+            var courseName = JSON.parse(args).data['courseName']
+
+            $.ajax({
+                type: "POST",
+                url: "/course/" + courseCode,
+                dataType: 'json',
+                data: {courseCode: courseCode},
+                success: function(data) {
+                    if (data.status != 409) {
+                        var msg = '<button type="submit" class="list-group-item" value=' + courseCode + '><span id="close">x</span>  ' + courseCode + ': ' + courseName + '</button>'
+                        $('#courses').prepend(msg);
+                    }
+                },
+                fail: function() {
+                }
+            });
+            $(".select2").val('').trigger('change');
+        }
+
+        <!-- delete courses -->
+        $('body').on('click', '#close', function(){
+            $form = $(this).closest('form');
+            $button = $(this).closest('button');
+
+            $.ajax({
+                type: "DELETE",
+                url: "/course/" + $(this).closest('button').attr('value'),
+                success: function(data) {
+                    window.location.reload();
+                },
+                fail: function() {
+                }
+            });
+        });
+
+        <!-- Active class added when clicked -->
+        $('body').on('click', '.list-group-item', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            if (!$this.hasClass('active')) {
+                // remove all other active buttons
+                $(".list-group-item").each(function () {$(this).removeClass('active')});
+                $this.addClass('active');
+                $('.suggested-ads').remove();
+            }
+            // Get all the Ads for a specific class
+            $.ajax({
+                type: "GET",
+                url: "/thread/" + $(this).val(),
+                timeout: 2000,
+                dataType: 'json',
+                success: function(data) {
+
+                    $("#all_threads").prepend(thread);
+
+                },
+                fail: function() {
+                    $('.main').html("failed loading courses");
+                }
+            });
+        });
+    });
+</script>
+</body>
