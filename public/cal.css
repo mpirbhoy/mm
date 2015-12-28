@@ -1,0 +1,13 @@
+table {
+	 border-collapse: collapse;
+}
+
+td {
+	padding-top: 0.5em;
+	padding-right: 3em;
+}	
+
+tr.line > td {
+	color: #A0A0A0 	;
+	border-top: 1pt solid #E8E8E8;
+}
