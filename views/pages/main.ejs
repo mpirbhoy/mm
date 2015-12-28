@@ -30,7 +30,7 @@
 <script>
     $(document).ready(function() {
         <!-- Load all the courses into HTML -->
-        courses = <%- courses %>;
+        var courses = [{courseCode: "CSC108", courseName:"A"},{courseCode: "CSC148", courseName:"B"},{courseCode: "CSC207", courseName:"C"}];
         for (var i = 0; i < courses.length; i++) {
             $('#courses').prepend("<button type='submit' class='list-group-item' value=" + courses[i].courseCode + "><span id='close'>x</span>  " + courses[i].courseCode + ": " + courses[i].courseName + "</button>");
         };
