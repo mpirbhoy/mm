@@ -1,0 +1,79 @@
+/* ==========================================================================
+PAGE 1: Main
+========================================================================== */
+
+/* ==========================================================================
+MAIN - SEARCH SIDE BAR
+========================================================================== */
+
+/* Hide for mobile, show later */
+.sidebar {
+    display: block;
+    background-color: #EEE;
+    padding: 20px;
+}
+@media (min-width: 768px) {
+    .sidebar {
+        position: fixed;
+        top: 51px;
+        bottom: 0;
+        left: 0;
+        z-index: 1000;
+        display: block;
+        padding: 20px;
+        overflow-x: hidden;
+        overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+        background-color: #EEE;
+        border-right: 1px solid #eee;
+    }
+}
+.list-group-item {
+    margin-bottom: 10px;
+}
+
+#close {
+    float:right;
+    padding:3px 4px;
+    color: #ddd;
+}
+
+#close:hover {
+    float:right;
+    padding:3px 4px;
+    color: #000;
+
+}
+
+/* ==========================================================================
+MAIN - THREADS
+========================================================================== */
+
+.main {
+    padding: 20px;
+}
+@media (min-width: 768px) {
+    .main {
+        padding-right: 40px;
+        padding-left: 40px;
+    }
+}
+.main .page-header {
+    margin-top: 0;
+}
+
+/*.form-search {*/
+    /*margin-left: 80%;*/
+    /*padding: 10px;*/
+    /*max-width: 220px;*/
+/*}*/
+
+.select2-result-repository { padding-top: 4px; padding-bottom: 3px; }
+.select2-result-repository__avatar { float: left; width: 60px; margin-right: 10px; }
+.select2-result-repository__avatar img { width: 100%; height: auto; border-radius: 2px; }
+.select2-result-repository__meta { margin-left: 70px; }
+.select2-result-repository__title { color: black; font-weight: bold; word-wrap: break-word; line-height: 1.1; margin-bottom: 4px; }
+.select2-result-repository__forks, .select2-result-repository__stargazers { margin-right: 1em; }
+.select2-result-repository__forks, .select2-result-repository__stargazers, .select2-result-repository__watchers { color: #999; font-size: 11.5px; }
+.select2-result-repository__description { font-size: 13px; color: #777; margin-top: 4px; }
+.select2-results__option--highlighted .select2-result-repository__title { color: white; }
+.select2-results__option--highlighted .select2-result-repository__forks, .select2-results__option--highlighted .select2-result-repository__stargazers, .select2-results__option--highlighted .select2-result-repository__description, .select2-results__option--highlighted .select2-result-repository__watchers { color: #c6dcef; }
