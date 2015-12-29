@@ -34,7 +34,11 @@ app.use(expressSession({
 //Sets up the routes that the server accepts
 require('./routes.js')(app);
 
+//Populate Data into Mongo
+require('./data/data_input.js')();
+
 //Creating and querying the postgres database
 app.listen(app.get('port'), function() {
     console.log("Starting Magic-Matrix Server at port " + app.get('port') + "!");
 });
+
