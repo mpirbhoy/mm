@@ -7,7 +7,7 @@ module.exports = mongoose.model('Course',{
     sectionDirector: {type: String, required: true},//Director for Section
     instructors: String, //instructors for the Section
     catalogs: [{type: mongoose.Schema.Types.ObjectId, ref: 'Catalog' }], //Catalogs belonging to Section
-    sectionMeetings: {
+    sectionMeetings: [{
     	type: String,
     		timings: {	day: String, 
     					startTime: String, 
@@ -15,6 +15,6 @@ module.exports = mongoose.model('Course',{
     					location: String
     				}
 
-    }
+    }]
 });
 
