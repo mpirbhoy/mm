@@ -70,7 +70,7 @@ function getDayStarttimeDuration(timingInput) {
 }
 
 function getCourseTitleInfo(inputString){
-
+    
     var FacCode  = inputString.split("/")[0];
     var courseCodeAndTitle = inputString.split("/")[1]; // RYER 4000   3.00 Ryerson York Exchange Course
 
@@ -101,23 +101,23 @@ module.exports = function () {
     };
     var dataLoc = 'file:///Users/franklai/code/mm/data/york_data0.json';
     var allData = readFile(dataLoc);
-
+    
     //
     for (var i = 0; i < allData.rows.length; i++){
-
+        
         // Conversions
         var arrayCourseTitleInfo = getCourseTitleInfo(allData.rows[i][dataFields.COURSE_TITLE]);
         var varyingMeetingsInfo = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
-
-
+        
+        
         //Courses
         var courseCode = arrayCourseTitleInfo.courseCode; //String
         var facultyCode =  allData.rows[i][dataFields.FACCODE].replace(" -", ""); //String
         var courseName = arrayCourseTitleInfo.courseName;  //String
-
+        
         var indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Prereq");
         var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
-
+        
         var prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(indexOfFirstPrereq, indexofFirstCourseExclusion); //[String]
         var exclusions = allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion); //[String]
         var courseNote = allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq); //String
@@ -128,12 +128,12 @@ module.exports = function () {
         var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
         var sectionInstructors = allData.rows[i].dataFields.REQ_MEETING_INSTRUCTOR;
         var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION]);
-
+        
         //Catalogs
         var catalogCode = allData.rows[i].dataFields.CAT_NUM;
         var catalogInstructors = allData.rows[i].dataFields.VARY_MEETING_INSTRUCTOR;
         var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
-
+        
         //If current row is not a catalog
         if (!allData[i][dataFields.CAT_NUM]) {
             //Search for course
@@ -142,17 +142,17 @@ module.exports = function () {
                 if (myCourse) {
                     var sectionExists = false;
                     var sectionIndex = null;
-
+                    
                     // Populating catalog
                     Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
-
+                        
                         for (var ii = 0; ii < data.sections.length; ii++) {
                             if (data.sections[i].sectionCode == sectionCode) {
                                 sectionExists = true;
                                 sectionIndex = ii;
                             }
                         }
-
+                        
                         if (!sectionExists) {
                             //CREATE SECTION 
                             var newSection = new Section({
@@ -164,23 +164,23 @@ module.exports = function () {
                                 sectionMeetings: [sectionMeeting]
                             });
                             newSection.save();
-
+                            
                             //ADD SECTION TO COURSE
                             data.sections.push(newSection);
                             //SAVE
                             data.save();
-
+                        
                         } else {
                             //UPDATE SECTIONS
                             data.sections[sectionIndex].sectionMeetings.push(sectionMeeting);
                             //SAVE
                             data.save();
                         }
-
-
+                            
+                        
                     });
-
-                    //If course is not found
+                
+                //If course is not found    
                 } else {
                     //CREATE SECTION
                     var newSection = new Section({
@@ -192,7 +192,7 @@ module.exports = function () {
                         sectionMeetings: [sectionMeeting]
                     });
                     newSection.save();
-
+                    
                     //CREATE COURSE AND ADD SECTION TO COURSE
                     var newCourse = new Course({
                         courseCode: courseCode,
@@ -203,13 +203,13 @@ module.exports = function () {
                         note: courseNote
                     });
                     newCourse.save();
-
+                    
                 }
             });
-
-
-
-            //If current row is a Catalog
+            
+            
+        
+        //If current row is a Catalog
         } else {
             //Search for course
             Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
@@ -217,17 +217,17 @@ module.exports = function () {
                 if (myCourse) {
                     var sectionExists = false;
                     var sectionIndex = null;
-
+                    
                     // Populating catalog
                     Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
-
+                        
                         for (var i = 0; i < data.sections.length; i++) {
                             if (data.sections[i].sectionCode == sectionCode) {
                                 sectionExists = true;
                                 sectionIndex = i;
                             }
                         }
-
+                        
                         if (!sectionExists) {
                             //CREATE CATALOG
                             var newCatalog = new Catalog({
@@ -236,7 +236,7 @@ module.exports = function () {
                                 meeting: [catalogMeeting]
                             });
                             newCatalog.save();
-
+                            
                             //CREATE SECTION AND ADD CATALOG TO SECTION
                             var newSection = new Section({
                                 sectionCode: sectionCode,
@@ -247,12 +247,12 @@ module.exports = function () {
                                 catalogs: [newCatalog]
                             });
                             newSection.save();
-
+                            
                             //ADD SECTION TO COURSE
                             data.sections.push(newSection);
                             //SAVE
                             data.save();
-
+                            
                         } else {
                             //CREATE CATALOG
                             var newCatalog = new Catalog({
@@ -261,17 +261,17 @@ module.exports = function () {
                                 meeting: [catalogMeeting]
                             });
                             newCatalog.save();
-
+                            
                             //ADD CATALOG TO SECTION
                             data.sections[sectionIndex].push(newCatalog);
                             //SAVE
                             data.save();
                         }
-
-
+                            
+                        
                     });
-
-                    //If course is not found
+                
+                //If course is not found    
                 } else {
                     //CREATE CATALOG
                     var newCatalog = new Catalog({
@@ -280,7 +280,7 @@ module.exports = function () {
                         meeting: [catalogMeeting]
                     });
                     newCatalog.save();
-
+                    
                     //CREATE SECTION AND ADD CATALOG TO SECTION
                     var newSection = new Section({
                         sectionCode: sectionCode,
@@ -290,7 +290,7 @@ module.exports = function () {
                         catalogs: [newCatalog]
                     });
                     newSection.save();
-
+                    
                     //CREATE COURSE AND ADD SECTION TO COURSE
                     var newCourse = new Course({
                         courseCode: courseCode,
@@ -301,9 +301,9 @@ module.exports = function () {
                         note: courseNote
                     });
                     newCourse.save();
-
+                    
                 }
-            });
+            });            
         }
     }
 
