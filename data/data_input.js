@@ -16,7 +16,11 @@ function readFile(file) {
     };
     rawFile.send(null);
 }
-module.exports = function (){
+
+function getDayStarttimeDurationt(){
+
+}
+module.exports = function () {
     var row, field;
     var dataFields = {
         FACCODE: 0,
@@ -35,13 +39,18 @@ module.exports = function (){
     var dataLoc = 'file:///Users/franklai/code/mm/data/york_data0.json';
     var allData = readFile(dataLoc);
 
-    //for (row in allData.rows) {
-    //   for (field in dataFields) {
-    //        new Catalog(
-    //            {
-    //            }
-    //        )
-    //   }
-    //}
+    for (var i = 0; i < allData.rows.length; i++){
+        if (allData[i][dataFields.CAT_NUM]) {
+            //TODO: Find if Cat exists
+            getDayStarttimeDuration(alldata[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
+            new Catalog({
+                catalogCode: alldata[i][dataFields.CAT_NUM],
+                instructors: allData[i][dataFields.VARY_MEETING_INSTRUCTOR],
+                meeting: {type: allData[i][dataFields.VARY_MEETING_TYPE],
+                    timings: [allData[i][dataFields.VAR]] }
+            })
+
+        }
+    }
 
 };

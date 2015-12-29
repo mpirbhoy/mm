@@ -2,7 +2,7 @@ var mongoose = require('mongoose');
 
 //Model for University Courses 
 module.exports = mongoose.model('Course',{
-    catalogCode: {type: String, required:true},//sectioncode for Catalog
+    catalogCode: {type: String, required:true, unique: true},//sectioncode for Catalog
     instructors: String, //instructors for the Catalog
     meeting: {
     	type: String,
