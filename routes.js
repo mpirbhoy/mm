@@ -1,7 +1,7 @@
 var express = require('express');
-var Course = require('../model/course');
-var Section = require('../model/section');
-var Catalog = require('../model/catalog');
+var Course = require('./model/course');
+var Section = require('./model/section');
+var Catalog = require('./model/catalog');
 
 		
 module.exports = function(app) {
@@ -40,3 +40,4 @@ module.exports = function(app) {
            	}
 		});
 	});
+}
