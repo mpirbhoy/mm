@@ -17,6 +17,23 @@ function readFile(file) {
     rawFile.send(null);
 }
 
+function getTerm(rawStr) {
+    var rawSplit = rawStr.split(' ');
+    return rawSplit[1];
+}
+
+function getSectionCode(rawStr) {
+    var rawSplit = rawStr.split(' ');
+    return rawSplit[3];
+}
+
+function getSectionDirector(rawStr) {
+    var rawSplit = rawStr.split(':');
+    var returnVal = rawSplit[1];
+    return returnVal.substring(1);
+}
+
+
 function getDayStarttimeDuration(timingInput) {
     //"M--12:00--120--YH  045      (Glendon campus)--||T--12:00--120--YH  B211     (Glendon campus)--||"
     var meeting, res, temp, meetingInfo;
@@ -49,16 +66,22 @@ function getDayStarttimeDuration(timingInput) {
             res.push(temp);
         }
     }
-    return res;
+    return res[0];
 }
 
 function getCourseTitleInfo(inputString){
-    // input:             "SC/RYER 4000   3.00 Ryerson York Exchange Course",
-    // Need var courseCode; //String
-    //      var courseName; //String
-    //      var FACCODE
-    var FacCode  = inputString.split("/");
     
+    var FacCode  = inputString.split("/")[0];
+    var courseCodeAndTitle = inputString.split("/")[1]; // RYER 4000   3.00 Ryerson York Exchange Course
+
+    var arrayOfcourseCodeAndTitle = courseCodeAndTitle.split("   "); //[RYER 4000, 3.00 Ryerson York Exchange Course]
+
+    var resCourseCode = arrayOfcourseCodeAndTitle[0].replace(' ', '');
+    var resCredit = arrayOfcourseCodeAndTitle[1].split(' ')[0];
+    var resCourseTitle = arrayOfcourseCodeAndTitle[1].replace(resCredit, '');
+
+    return {courseCode: resCourseCode.trim(), credit: resCredit.trim(), courseName: resCourseTitle.trim()};
+
 }
 module.exports = function () {
     var row, field;
@@ -83,30 +106,33 @@ module.exports = function () {
     for (var i = 0; i < allData.rows.length; i++){
         
         // Conversions
-        var arrayCourseTitleInfo = getCourseTitleInfo(allData[i][dataFields.COURSE_TITLE]);
-        var varyingMeetingsInfo = getDayStarttimeDuration(allData[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
+        var arrayCourseTitleInfo = getCourseTitleInfo(allData.rows[i][dataFields.COURSE_TITLE]);
+        var varyingMeetingsInfo = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
         
         
         //Courses
-        var courseCode = allData[i][dataFields.FACCODE].replace(" -"); //String
-        var facultyCode; //String
-        var courseName; //String
-        var prereqs; //[String]
-        var exclusions; //[String]
-        var courseNote; //String
+        var courseCode = arrayCourseTitleInfo.courseCode; //String
+        var facultyCode =  allData.rows[i][dataFields.FACCODE].replace(" -", ""); //String
+        var courseName = arrayCourseTitleInfo.courseName;  //String
+        
+        var indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Prereq");
+        var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
+        
+        var prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(indexOfFirstPrereq, indexofFirstCourseExclusion); //[String]
+        var exclusions = allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion); //[String]
+        var courseNote = allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq); //String
 
         //Sections
-        var sectionCode; //String
-        var sectionDirector; //String
-        var sectionInstructors; //String
-        var sectionMeeting; //JSON Object (refer to Schema)
+        var sectionCode = getSectionCode(allData.rows[i][dataFields.TERM_AND_SECTION]);
+        var term = getTerm(allData.rows[i][dataFields.TERM_AND_SECTION]);
+        var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
+        var sectionInstructors = allData.rows[i].dataFields.REQ_MEETING_INSTRUCTOR;
+        var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION]);
         
         //Catalogs
-        var catalogCode; //String
-        var catalogInstructors; //String
-        var catalogMeeting; //JSON Object (refer to Schema)
-        
-
+        var catalogCode = allData.rows[i].dataFields.CAT_NUM;
+        var catalogInstructors = allData.rows[i].dataFields.VARY_MEETING_INSTRUCTOR;
+        var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
         
         //If current row is not a catalog
         if (!allData[i][dataFields.CAT_NUM]) {
@@ -131,6 +157,7 @@ module.exports = function () {
                             //CREATE SECTION 
                             var newSection = new Section({
                                 sectionCode: sectionCode,
+                                term: term,
                                 sectionDirector: sectionDirector,
                                 instructors: sectionInstructors,
                                 catalogs: [],
@@ -158,6 +185,7 @@ module.exports = function () {
                     //CREATE SECTION
                     var newSection = new Section({
                         sectionCode: sectionCode,
+                        term: term,
                         sectionDirector: sectionDirector,
                         instructors: sectionInstructors,
                         catalogs: [],
@@ -212,6 +240,7 @@ module.exports = function () {
                             //CREATE SECTION AND ADD CATALOG TO SECTION
                             var newSection = new Section({
                                 sectionCode: sectionCode,
+                                term: term,
                                 sectionDirector: sectionDirector,
                                 instructors: sectionInstructors,
                                 sectionMeetings: [],
@@ -255,6 +284,7 @@ module.exports = function () {
                     //CREATE SECTION AND ADD CATALOG TO SECTION
                     var newSection = new Section({
                         sectionCode: sectionCode,
+                        term: term,
                         sectionDirector: sectionDirector,
                         instructors: sectionInstructors,
                         catalogs: [newCatalog]
