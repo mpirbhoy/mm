@@ -25,7 +25,7 @@ function getTerm(rawStr) {
 }
 
 function getSectionCode(rawStr) {
-    var rawSplit = rawStr.split(' ');
+    var rawSplit = rawStr.replace('  ', ' ').split(' ');
     return rawSplit[3];
 }
 
@@ -64,40 +64,46 @@ function getDayStarttimeDuration(timingInput) {
             //["M", "12:00", "120", "YH  045      (Glendon campus)", ""]
 
             temp = {
-                day: daysEnum[meetingInfo[0]],
-                startTime: meetingInfo[1],
+                day: daysEnum[meetingInfo[0]] || null,
+                startTime: meetingInfo[1] ,
                 duration: meetingInfo[2],
-                location: meetingInfo[3]
+                location: meetingInfo[3] || null
             };
 
             res.push(temp);
         }
     }
-    return res[0];
+    return res;
 }
 
 function getCourseTitleInfo(inputString){
-        console.log(inputString);
 
     if (inputString == null) {
         return null;
     }
 
     //Swapping for standard whitespaces 
-    inputString = inputString.replace(" ", " ");
+    inputString = inputString.replace("   ", " ").replace("  ", " ");
 
     var FacCode  = inputString.split("/")[0];
     var courseCodeAndTitle = inputString.split("/")[1]; // RYER 4000   3.00 Ryerson York Exchange Course
+        
+    var arrayOfcourseCodeAndTitle = courseCodeAndTitle.split(" ");
+    //console.log("arrayOfcourseCodeAndTitle = " + arrayOfcourseCodeAndTitle);
+    //[RYER 4000, 3.00 Ryerson York Exchange Course]
 
-    var arrayOfcourseCodeAndTitle = courseCodeAndTitle.split("  "); //[RYER 4000, 3.00 Ryerson York Exchange Course]
-
-    var resCourseCode = arrayOfcourseCodeAndTitle[0].replace(' ', '');
-    var resCredit = arrayOfcourseCodeAndTitle[1].trim().split(' ')[0];
-    var resCourseTitle = arrayOfcourseCodeAndTitle[1].trim().replace(resCredit, '');
-
-    return {courseCode: resCourseCode.trim(), credit: resCredit.trim(), courseName: resCourseTitle.trim()};
+    arrayOfcourseCodeAndTitle[0].replace("  ", " ");
+    var resCourseCode = arrayOfcourseCodeAndTitle[0] + arrayOfcourseCodeAndTitle[1];
+    var resCredit = arrayOfcourseCodeAndTitle[2];
+    
+    var resCourseTitle = "";
+        for (var i = 3; i < arrayOfcourseCodeAndTitle.length; i ++){
+        resCourseTitle += arrayOfcourseCodeAndTitle[i] + " ";
+    }
+    return {courseCode: resCourseCode.trim(), credit: resCredit.trim(), courseName: resCourseTitle.trim(), facCode: FacCode.trim()};
 
 }
+
 module.exports = function () {
     var row, field;
     var dataFields = {
@@ -131,24 +137,25 @@ module.exports = function () {
 
 
         //Courses
+        console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
         console.log(i);
         var courseCode = arrayCourseTitleInfo.courseCode; //String
         console.log(courseCode );
-        var facultyCode =  allData.rows[i][dataFields.FACCODE].replace(" -", ""); //String
+        var facultyCode =  arrayCourseTitleInfo.facCode; //String
         console.log(facultyCode );
         var courseName = arrayCourseTitleInfo.courseName;  //String
         console.log(courseName );
 
         var indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Prereq");
-        console.log(indexOfFirstPrereq );
         var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
-        console.log(indexofFirstCourseExclusion );
 
         var prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(indexOfFirstPrereq, indexofFirstCourseExclusion); //[String]
         console.log(prereqs );
         var exclusions = allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion); //[String]
+        console.log('------------------------------------');
         console.log(exclusions );
         var courseNote = allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq); //String
+        console.log('------------------------------------');
         console.log(courseNote );
 
         //Sections
@@ -198,7 +205,7 @@ module.exports = function () {
                                 sectionDirector: sectionDirector,
                                 instructors: sectionInstructors,
                                 catalogs: [],
-                                sectionMeetings: [sectionMeeting]
+                                sectionMeetings: sectionMeeting
                             });
                             newSection.save();
 
@@ -209,7 +216,7 @@ module.exports = function () {
 
                         } else {
                             //UPDATE SECTIONS
-                            data.sections[sectionIndex].sectionMeetings.push(sectionMeeting);
+                            data.sections[sectionIndex].sectionMeetings = data.sections[sectionIndex].sectionMeetings.concat(sectionMeeting);
                             //SAVE
                             data.save();
                         }
@@ -226,7 +233,7 @@ module.exports = function () {
                         sectionDirector: sectionDirector,
                         instructors: sectionInstructors,
                         catalogs: [],
-                        sectionMeetings: [sectionMeeting]
+                        sectionMeetings: sectionMeeting
                     });
                     newSection.save();
 
@@ -270,7 +277,7 @@ module.exports = function () {
                             var newCatalog = new Catalog({
                                 catalogCode: catalogCode,
                                 instructors: catalogInstructors,
-                                meeting: [catalogMeeting]
+                                meeting: catalogMeeting
                             });
                             newCatalog.save();
 
@@ -295,7 +302,7 @@ module.exports = function () {
                             var newCatalog = new Catalog({
                                 catalogCode: catalogCode,
                                 instructors: catalogInstructors,
-                                meeting: [catalogMeeting]
+                                meeting: catalogMeeting
                             });
                             newCatalog.save();
 
@@ -314,7 +321,7 @@ module.exports = function () {
                     var newCatalog = new Catalog({
                         catalogCode: catalogCode,
                         instructors: catalogInstructors,
-                        meeting: [catalogMeeting]
+                        meeting: catalogMeeting
                     });
                     newCatalog.save();
 
