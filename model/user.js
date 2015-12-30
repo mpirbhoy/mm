@@ -13,6 +13,6 @@ module.exports = mongoose.model('User',{
 	selections: {
 		courses: {type: mongoose.Schema.Types.ObjectId, ref: 'Course'},
 		sections: {type: mongoose.Schema.Types.ObjectId, ref: 'Section'},
-		sections: {type: mongoose.Schema.Types.ObjectId, ref: 'Catalog'}
+		catelogs: {type: mongoose.Schema.Types.ObjectId, ref: 'Catalog'}
 	}
 });
