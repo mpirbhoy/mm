@@ -133,27 +133,43 @@ module.exports = function () {
         //Courses
         console.log(i);
         var courseCode = arrayCourseTitleInfo.courseCode; //String
+        console.log(courseCode );
         var facultyCode =  allData.rows[i][dataFields.FACCODE].replace(" -", ""); //String
+        console.log(facultyCode );
         var courseName = arrayCourseTitleInfo.courseName;  //String
+        console.log(courseName );
 
         var indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Prereq");
+        console.log(indexOfFirstPrereq );
         var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
+        console.log(indexofFirstCourseExclusion );
 
         var prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(indexOfFirstPrereq, indexofFirstCourseExclusion); //[String]
+        console.log(prereqs );
         var exclusions = allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion); //[String]
+        console.log(exclusions );
         var courseNote = allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq); //String
+        console.log(courseNote );
 
         //Sections
         var sectionCode = getSectionCode(allData.rows[i][dataFields.TERM_AND_SECTION]);
+        console.log(sectionCode );
         var term = getTerm(allData.rows[i][dataFields.TERM_AND_SECTION]);
+        console.log(term );
         var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
+        console.log(sectionDirector );
         var sectionInstructors = allData.rows[i][dataFields.REQ_MEETING_INSTRUCTOR];
+        console.log(sectionInstructors );
         var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION]);
+        console.log(sectionMeeting );
 
         //Catalogs
         var catalogCode = allData.rows[i][dataFields.CAT_NUM];
+        console.log(catalogCode );
         var catalogInstructors = allData.rows[i][dataFields.VARY_MEETING_INSTRUCTOR];
+        console.log(catalogInstructors );
         var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
+        console.log(catalogMeeting );
 
         //If current row is not a catalog
         if (!allData.rows[i][dataFields.CAT_NUM]) {
