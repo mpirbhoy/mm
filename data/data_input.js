@@ -3,7 +3,9 @@ var Catalog = require('../model/catalog');
 var Course = require('../model/course');
 var Section = require('../model/section');
 var User = require('../model/user');
+var allData = require("./york_data0.json");
 
+/*
 function readFile(file) {
     var rawFile = new XMLHttpRequest();
     rawFile.open("GET", file, false);
@@ -15,7 +17,7 @@ function readFile(file) {
         }
     };
     rawFile.send(null);
-}
+}*/
 
 function getTerm(rawStr) {
     var rawSplit = rawStr.split(' ');
@@ -35,6 +37,11 @@ function getSectionDirector(rawStr) {
 
 
 function getDayStarttimeDuration(timingInput) {
+    if (timingInput == null) {
+        return null;
+    }
+
+
     //"M--12:00--120--YH  045      (Glendon campus)--||T--12:00--120--YH  B211     (Glendon campus)--||"
     var meeting, res, temp, meetingInfo;
     var daysEnum = {
@@ -70,15 +77,22 @@ function getDayStarttimeDuration(timingInput) {
 }
 
 function getCourseTitleInfo(inputString){
-    
+        console.log(inputString);
+
+    if (inputString == null) {
+        return null;
+    }
+
+    //Swapping for standard whitespaces 
+    inputString = inputString.replace(" ", " ");
     var FacCode  = inputString.split("/")[0];
     var courseCodeAndTitle = inputString.split("/")[1]; // RYER 4000   3.00 Ryerson York Exchange Course
 
-    var arrayOfcourseCodeAndTitle = courseCodeAndTitle.split("   "); //[RYER 4000, 3.00 Ryerson York Exchange Course]
+    var arrayOfcourseCodeAndTitle = courseCodeAndTitle.split("  "); //[RYER 4000, 3.00 Ryerson York Exchange Course]
 
     var resCourseCode = arrayOfcourseCodeAndTitle[0].replace(' ', '');
-    var resCredit = arrayOfcourseCodeAndTitle[1].split(' ')[0];
-    var resCourseTitle = arrayOfcourseCodeAndTitle[1].replace(resCredit, '');
+    var resCredit = arrayOfcourseCodeAndTitle[1].trim().split(' ')[0];
+    var resCourseTitle = arrayOfcourseCodeAndTitle[1].trim().replace(resCredit, '');
 
     return {courseCode: resCourseCode.trim(), credit: resCredit.trim(), courseName: resCourseTitle.trim()};
 
@@ -99,18 +113,23 @@ module.exports = function () {
         VARY_MEETING_TYPE: 10,
         VARY_MEETING_DAY_START_TIME_DURATION: 11
     };
-    var dataLoc = 'file:///Users/franklai/code/mm/data/york_data0.json';
-    var allData = readFile(dataLoc);
+    
     
     //
     for (var i = 0; i < allData.rows.length; i++){
         
+        //Checking if row has null on keys
+        if (!allData.rows[i][dataFields.COURSE_TITLE] || !allData.rows[i][dataFields.TERM_AND_SECTION || !(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION || allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]])]) {
+            continue;
+        }
+
         // Conversions
         var arrayCourseTitleInfo = getCourseTitleInfo(allData.rows[i][dataFields.COURSE_TITLE]);
         var varyingMeetingsInfo = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
         
         
         //Courses
+        console.log(i);
         var courseCode = arrayCourseTitleInfo.courseCode; //String
         var facultyCode =  allData.rows[i][dataFields.FACCODE].replace(" -", ""); //String
         var courseName = arrayCourseTitleInfo.courseName;  //String
@@ -126,16 +145,16 @@ module.exports = function () {
         var sectionCode = getSectionCode(allData.rows[i][dataFields.TERM_AND_SECTION]);
         var term = getTerm(allData.rows[i][dataFields.TERM_AND_SECTION]);
         var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
-        var sectionInstructors = allData.rows[i].dataFields.REQ_MEETING_INSTRUCTOR;
+        var sectionInstructors = allData.rows[i][dataFields.REQ_MEETING_INSTRUCTOR];
         var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION]);
         
         //Catalogs
-        var catalogCode = allData.rows[i].dataFields.CAT_NUM;
-        var catalogInstructors = allData.rows[i].dataFields.VARY_MEETING_INSTRUCTOR;
+        var catalogCode = allData.rows[i][dataFields.CAT_NUM];
+        var catalogInstructors = allData.rows[i][dataFields.VARY_MEETING_INSTRUCTOR];
         var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION]);
         
         //If current row is not a catalog
-        if (!allData[i][dataFields.CAT_NUM]) {
+        if (!allData.rows[i][dataFields.CAT_NUM]) {
             //Search for course
             Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
                 //If course found
