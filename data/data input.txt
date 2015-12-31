@@ -123,13 +123,11 @@ module.exports = function () {
     
     
     
-    allData.rows.forEach(function(value, i) {
-
-    //for (var i = 0; i < allData.rows.length; i++){
+    for (var i = 0; i < allData.rows.length; i++){
         
         //Checking if row has null on keys
         if (!allData.rows[i][dataFields.COURSE_TITLE] || !allData.rows[i][dataFields.TERM_AND_SECTION] || !(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION] || allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION])) {
-            return;
+            continue;
         }
 
 
@@ -184,7 +182,6 @@ module.exports = function () {
         if (!allData.rows[i][dataFields.CAT_NUM]) {
             //Search for course
             Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
-
                 //If course found
                 if (myCourse) {
                     var sectionExists = false;
@@ -243,7 +240,7 @@ module.exports = function () {
                     //CREATE COURSE AND ADD SECTION TO COURSE
                     var newCourse = new Course({
                         courseCode: courseCode,
-                        facultyCode: facultyCode + " " + i,
+                        facultyCode: facultyCode,
                         prereqs: prereqs,
                         exclusions: exclusions,
                         sections: [newSection],
@@ -341,7 +338,7 @@ module.exports = function () {
                     //CREATE COURSE AND ADD SECTION TO COURSE
                     var newCourse = new Course({
                         courseCode: courseCode,
-                        facultyCode: facultyCode + " " + i,
+                        facultyCode: facultyCode,
                         prereqs: prereqs,
                         exclusions: exclusions,
                         sections: [newSection],
@@ -352,6 +349,6 @@ module.exports = function () {
                 }
             });
         }
-    });
+    }
 
 };
