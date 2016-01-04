@@ -7,7 +7,8 @@ module.exports = mongoose.model('Course',{
     courseName: String,	//title of the course
     credits: String, //credits for course
     prereqs: [String],  //prerequisites for the course
-    exclusions: [String], //exclusions for the course
+    exclusions: [String], //exclusions for the course,
+    title: String, //title of the course
     sections:[{type: mongoose.Schema.Types.ObjectId, ref: 'Section' }], //Sections of Course
     note: String
 });

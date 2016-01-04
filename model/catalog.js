@@ -4,8 +4,10 @@ var mongoose = require('mongoose');
 module.exports = mongoose.model('Catalog',{
     catalogCode: {type: String, required:true},//sectioncode for Catalog
     instructors: String, //instructors for the Catalog
+	debug_course: String,
+	debug_section: String,
     meeting: {
-    	type: String,
+    	type: {type: String},
     		timings: [{	day: String,
     					startTime: String,
     					duration: String,
