@@ -1,5 +1,5 @@
 /* ==========================================================================
-PAGE 1: Main
+PAGE 2: Main
 ========================================================================== */
 
 /* ==========================================================================
@@ -10,7 +10,7 @@ MAIN - SEARCH SIDE BAR
 .sidebar {
     display: block;
     background-color: #EEE;
-    padding: 20px;
+    padding: 20px 0 5px 0;
 }
 @media (min-width: 768px) {
     .sidebar {
@@ -23,10 +23,20 @@ MAIN - SEARCH SIDE BAR
         padding: 20px;
         overflow-x: hidden;
         overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-        background-color: #EEE;
+        background-color: #F8F8F8;
         border-right: 1px solid #eee;
     }
+
+    .col-lg-6 {
+        padding-top: 60px;
+    }
 }
+
+@media (max-width: 768px) {
+    div .sidebar {
+        padding-top: 60px;
+    }}
+
 .list-group-item {
     margin-bottom: 10px;
 }
@@ -44,28 +54,88 @@ MAIN - SEARCH SIDE BAR
 
 }
 
-/* ==========================================================================
-MAIN - THREADS
-========================================================================== */
-
-.main {
-    padding: 20px;
-}
-@media (min-width: 768px) {
-    .main {
-        padding-right: 40px;
-        padding-left: 40px;
-    }
-}
-.main .page-header {
-    margin-top: 0;
+.bold {
+    font-weight: bold;
 }
 
-/*.form-search {*/
-    /*margin-left: 80%;*/
-    /*padding: 10px;*/
-    /*max-width: 220px;*/
+.margin {
+    margin: 5px 0 0 0;
+}
+
+.panel {
+    margin-bottom: 10px;
+    background-color: #fff;
+    border: 0px solid transparent;
+}
+
+.red {
+    color: #00cccc;
+    /*font-weight: bold;*/
+    /*margin-bottom: 3px;*/
+}
+
+.navbar-brand {
+    font-family: 'Montserrat', serif;
+    font-size: 26px;
+    color: white;
+}
+
+.navbar {
+    background-color: #222;
+    border-color: #E7E7E7;
+}
+
+.section {
+    display: -moz-inline-stack;
+    display: inline-block;
+    margin-right: 2px;
+    margin-left: 2px;
+    padding-right: 1px;
+    padding-left: 1px;
+    border: 1px solid green;
+    color: green;
+    cursor: pointer;
+    -ms-zoom: 1;
+    zoom: 1;
+}
+
+button {
+    line-height: 10px;
+}
+.fc-agendaWeek-view {
+    width: 100%;
+    margin-top: 20px;
+    /*height: 5px; !important;*/
+}
+
+.fc-agendaWeek-view tr {
+    height: 4px;
+}
+
+/*.fc-agenda-slots td div {*/
+/*height: 15px !important;*/
+
 /*}*/
+
+/*.fc-agenda-axis{*/
+/*font-size: 6px !important;*/
+/*height: 10px !important;*/
+/*line-height: 10px !important;*/
+/*}*/
+
+.fc-time-grid .fc-slats td {
+    height: 1em;
+    border-bottom: 0;
+}
+
+.main {font-size: 11px;}
+
+.fc-time-grid-event {
+    padding: 7px;
+    font-size: 1.05em;
+    text-align: center;
+    vertical-align: middle;
+}
 
 .select2-result-repository { padding-top: 4px; padding-bottom: 3px; }
 .select2-result-repository__avatar { float: left; width: 60px; margin-right: 10px; }
