@@ -1,14 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="e667be66-5935-451c-a6e4-118b4102ea86" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/data/data_input.js" afterPath="$PROJECT_DIR$/data/data_input.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/catalog.js" afterPath="$PROJECT_DIR$/model/catalog.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/course.js" afterPath="$PROJECT_DIR$/model/course.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/model/section.js" afterPath="$PROJECT_DIR$/model/section.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
-    </list>
+    <list default="true" id="e667be66-5935-451c-a6e4-118b4102ea86" name="Default" comment="" />
     <ignored path="mm.iws" />
     <ignored path=".idea/workspace.xml" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
