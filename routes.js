@@ -32,9 +32,9 @@ module.exports = function(app) {
         });
     });
 
-	app.get('/course/:courseCode', function(req, res) {
+	app.get('/course/:courseCode/:title', function(req, res) {
 		var courseCode = req.params.courseCode;
-		Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
+		Course.where({courseCode: courseCode, title: title}).findOne().populate('sections').lean().exec(function (err, myCourse) {
             if (err) {
                         res.json({
                             status: 409,
@@ -43,6 +43,7 @@ module.exports = function(app) {
             } else if (myCourse) {
             	// Populating catalog
                 Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
+
                     res.send(JSON.parse(JSON.stringify(myCourse)));
                 });
            	}
