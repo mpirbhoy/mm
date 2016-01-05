@@ -11,23 +11,32 @@ module.exports = function(app) {
 	});
 
 	app.get('/allCourses', function(req, res) {
-		Course.find({courseCode: new RegExp(req.query.term, "i")}).populate('sections').lean().exec(function (err, myCourse) {
-            if (myCourse) {
+        var allCourses = [];
+        var i = 1;
 
-                // Populating catalog
-                Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
-                    res.send(data);
+        Course.find({courseCode: new RegExp(req.query.term, "i")}, function (err, courses) {
+            if (courses) {
+                courses.forEach(function (course) {
+                    var tempCourse = {};
+                    tempCourse.id = i;
+                    tempCourse.courseCode = course.courseCode;
+                    tempCourse.facultyCode = course.facultyCode;
+                    tempCourse.courseName = course.title;
+                    tempCourse.credits = course.credits;
+                    tempCourse.prereqs = course.prereqs;
+                    tempCourse.exclusions = course.exclusions;
+                    tempCourse.note = course.note;
+                    allCourses.push(tempCourse);
                 });
-
+                res.send(JSON.parse(JSON.stringify(allCourses)));
             }
-       }); 	
+        });
+    });
 
-	});
-
-	app.get('/course/@courseCode', function(req, res) {
+	app.get('/course/:courseCode', function(req, res) {
 		var courseCode = req.params.courseCode;
 		Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
-			if (findCourseErr) {
+            if (err) {
                         res.json({
                             status: 409,
                             msg: "Errors when trying to find the course for enrollment"
@@ -35,7 +44,7 @@ module.exports = function(app) {
             } else if (myCourse) {
             	// Populating catalog
                 Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
-                    res.send(data);
+                    res.send(myCourse);
                 });
            	}
 		});
