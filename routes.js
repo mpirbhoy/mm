@@ -11,8 +11,8 @@ module.exports = function(app) {
 	});
 
 	app.get('/allCourses', function(req, res) {
-        if (req.query.term == null || req.query.size == 0) {
-            res.status(404);
+        if (req.query.term == null || req.query.term.length <= 3) {
+            res.status(404).send('Try longer query');
             return;
         }
         var allCourses = [];
@@ -42,7 +42,7 @@ module.exports = function(app) {
 		Course.where({courseCode: courseCode, title: title}).findOne().populate('sections').lean().exec(function (err, myCourse) {
             if (err) {
                         res.json({
-                            status: 409,
+                            status: 404,
                             msg: "Errors when trying to find the course for enrollment"
                         })
             } else if (myCourse) {
