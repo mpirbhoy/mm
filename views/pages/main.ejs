@@ -119,7 +119,7 @@
 
             $.ajax({
                 type: "GET",
-                url: "/course/" + courseCode,
+                url: "/course/" + courseCode + "/" + courseName,
                 dataType: 'json',
                 success: function(data) {
                     localStorage[courseCode] = JSON.stringify(data);
