@@ -34,6 +34,7 @@ module.exports = function(app) {
 
 	app.get('/course/:courseCode/:title', function(req, res) {
 		var courseCode = req.params.courseCode;
+        var title = req.params.title;
 		Course.where({courseCode: courseCode, title: title}).findOne().populate('sections').lean().exec(function (err, myCourse) {
             if (err) {
                         res.json({
