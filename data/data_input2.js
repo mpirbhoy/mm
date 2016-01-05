@@ -3,7 +3,7 @@ var Catalog = require('../model/catalog');
 var Course = require('../model/course');
 var Section = require('../model/section');
 var User = require('../model/user');
-var allData = require("./york_data0.json");
+var allData = require("./york_data1.json");
 var async = require("async");
 var i = -1;
 var dataFields = {
@@ -212,7 +212,7 @@ function doStupidShit(callback) {
     //If current row is not a catalog
     if (!allData.rows[i][dataFields.CAT_NUM]) {
         //Search for course
-        Course.where({courseCode: courseCode}).findOne().populate('sections').exec(function (err, myCourse) {
+        Course.where({courseCode: courseCode, title: courseName}).findOne().populate('sections').exec(function (err, myCourse) {
 
             //If course found
             if (myCourse) {
@@ -296,7 +296,7 @@ function doStupidShit(callback) {
         //If current row is a Catalog
     } else {
         //Search for course
-        Course.where({courseCode: courseCode}).findOne().populate('sections').exec(function (err, myCourse) {
+        Course.where({courseCode: courseCode, title: courseName}).findOne().populate('sections').exec(function (err, myCourse) {
             //If course found
             if (myCourse) {
                 var sectionExists = false;
