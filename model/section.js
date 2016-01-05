@@ -13,6 +13,7 @@ module.exports = mongoose.model('Section',{
     		timings: [{	day: String,
     					startTime: String, 
     					duration: String,
+                        endTime: String,
     					location: String
     				}]
 

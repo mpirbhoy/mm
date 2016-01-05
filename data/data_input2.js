@@ -84,10 +84,27 @@ function getDayStarttimeDuration(timingInput, myType) {
             meetingInfo = meetings[ii].split("--");
             //["M", "12:00", "120", "YH  045      (Glendon campus)", ""]
 
+            function timeToMins(time) {
+                var b = time.split(':');
+                return b[0]*60 + +b[1];
+            }
+
+            function timeFromMins(mins) {
+                function z(n){return (n<10? '0':'') + n;}
+                var h = (mins/60 |0) % 24;
+                var m = mins % 60;
+                return z(h) + ':' + z(m);
+            }
+
+            function addTimes(dur, start) {
+                return timeFromMins(parseInt(dur) + timeToMins(start));
+            }
+
             temp = {
                 day: daysEnum[meetingInfo[0]] || null,
                 startTime: meetingInfo[1],
                 duration: meetingInfo[2],
+                endTime: (addTimes(meetingInfo[2], meetingInfo[1])),
                 location: meetingInfo[3] || null
             };
 
