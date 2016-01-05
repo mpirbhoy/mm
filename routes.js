@@ -44,7 +44,7 @@ module.exports = function(app) {
             } else if (myCourse) {
             	// Populating catalog
                 Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
-                    res.send(myCourse);
+                    res.send(JSON.parse(JSON.stringify(myCourse)));
                 });
            	}
 		});
