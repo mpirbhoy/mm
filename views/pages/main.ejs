@@ -116,31 +116,28 @@
 
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
-            var coursePre = JSON.parse(args).data['prereqs'];
-            var courseExc = JSON.parse(args).data['exclusions'];
-
 
             $.ajax({
                 type: "GET",
-                url: "/course/" + courseCode,
+                url: "/course/" + courseCode + "/" + courseName,
                 dataType: 'json',
                 success: function(data) {
                     localStorage[courseCode] = JSON.stringify(data);
-                    var section = data.sections;
+                    var sections = data.sections;
                     if (data.status != 409) {
                         var msg = '<div class="panel panel-default">'+
                                 '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
                         msg += data.note + "<br>";
-                        if (coursePre) {
-                            msg += "<span class='bold'> PRE: </span>" + coursePre + "<br>";
+                        if (data.prereqs) {
+                            msg += "<span class='title'> PRE: </span>" + data.prereqs + "<br>";
                         }
-                        if (courseExc) {
-                            msg += "<span class='bold'> EXC: </span>" + courseExc + "<br>";
+                        if (data.exclusions) {
+                            msg += "<span class='title'> EXC: </span>" + data.exclusions + "<br>";
                         }
-                        msg += "<div class='margin'><span class='bold'>SECTION: </span>";
-                        section.forEach(function (lec) {
-                            msg += "<div  class='section'>" + lec.sectionCode + "</div>";
+                        msg += "<div class='section'><span class='title'>SECTION: </span>";
+                        sections.forEach(function (section) {
+                            msg += "<div  class='content'>" + section.sectionCode + "</div>";
                         });
 //
 //                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
@@ -165,12 +162,47 @@
             $(".select2").val('').trigger('change');
         }
 
-        $('body').on('click', '.section', function() {
+        $('body').on('click', '.section .content', function() {
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
+            var $sectionSelected = $(this).text();
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
-                console.log(data);
+                var sections = data.sections;
+                var msg = "<div class='lecture'><span class='title'>MAIN: </span>";
+
+                sections.forEach(function (section) {
+//                    console.log(section.sectionCode === $sectionSelected);
+                    if (section.sectionCode === $sectionSelected) {
+                        if (section.sectionMeetings.length === 0 && section.catalogs.length === 1) {
+                            msg += "<div  class='content'>" + section.catalogs[0].meeting.type + "</div></div>";
+                        } else if (section.sectionMeetings.length > 1) {
+
+                        }
+                    }
+                });
+
+
+//                var msg = '<div class="panel panel-default">'+
+//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+//                msg += data.note + "<br>";
+
+
+
+
+
+//                catalogs.forEach(function (lecture) {
+//                    msg += "<div  class='section'>" + lecture.sectionCode + "</div>";
+//                });
+
+                if( $('.lecture').length ) {        // use this if you are using class to check
+                    $('.lecture').replaceWith(msg);
+                } else {
+                    $('.panel-body').append(msg);
+                }
+
+
             }
         });
 
@@ -212,35 +244,58 @@
 //        }, '.section');
 
         // Add lecture session on calendar
-        $('body').on('click', '.meeting', function(e) {
+        $('body').on('click', '.lecture .content', function(e) {
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
-            var $time = $(this).next().html().split('/'); //$time[0] = date, $time[1] = startTime, $time[2] = endTime, time[3] = location
-            sourceClicked.push({
-                id: $courseCode,
-                title: $courseCode+'\n'+$time[3],
-                start: $time[0] + 'T' + $time[1],
-                end: $time[0] + 'T' + $time[2],
-                color:'#4fd84a'
-            });
-
-            if (localStorage.getItem("data") === null) {
-                localStorage["data"] = JSON.stringify(sourceClicked);
-                $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
-                console.log('added');
+            var $sectionSelected;
+            if (localStorage.getItem($courseCode) === null) {
             } else {
-                var data = JSON.parse(localStorage.getItem());
-                console.log(data);
-//                var index = data.indexOf(JSON.stringify(sourceClicked[sourceClicked.length-1]));
-                data.forEach(function(val, i) {
-                    if (val.id === sourceClicked[sourceClicked.length-1].id &&
-                            val.start === sourceClicked[sourceClicked.length-1].start) {
-                        data.splice(i, 1);
+                var data = JSON.parse(localStorage.getItem($courseCode));
+                var sections = data.sections;
+
+                sections.forEach(function (section) {
+//                    console.log(section.sectionCode === $sectionSelected);
+                    if (section.sectionCode === $sectionSelected) {
+                        var catalogs =  section.catalogs;
+                        catalogs.forEach(function (catalog) {
+                            var meetingTime = catalog.meeting.timings;
+                            meetingTime.forEach(function (time) {
+                                sourceClicked.push({
+                                    id: $courseCode,
+                                    title: $courseCode+'\n'+catalog.meeting.type,
+                                    start: convertDayToDate(time.day) + 'T' + time.startTime,
+                                    end: convertDayToDate(time.day) + 'T' + time.endTime,
+                                    color:'#4fd84a'
+                                });
+                            })
+                        })
                     }
                 });
-                $('#calendar').fullCalendar( 'addEventSource', data);
-                localStorage["data"] = JSON.stringify(data);
             }
+            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
         });
+
+        function convertDayToDate(day) {
+            var date = "2015-12-";
+            switch (day) {
+                case "Monday":
+                    date += 21;
+                    break;
+                case "Tuesday":
+                    date += 22;
+                    break;
+                case "Wednesday":
+                    date += 23;
+                    break;
+                case "Thursday":
+                    date += 24;
+                    break;
+                case "Friday":
+                    date += 25;
+                    break;
+            }
+            console.log(date);
+            return date;
+        }
 
 
 

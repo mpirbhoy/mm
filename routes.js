@@ -11,9 +11,13 @@ module.exports = function(app) {
 	});
 
 	app.get('/allCourses', function(req, res) {
+        if (req.query.term == null || req.query.term.length <= 3) {
+            res.status(404).send('Try longer query');
+            return;
+        }
         var allCourses = [];
         var i = 1;
-        Course.find({courseCode: new RegExp(req.query.term, "i")}, function (err, courses) {
+        Course.find({courseCode: new RegExp(req.query.term.replace(/\s+/g, ''), "i")}, function (err, courses) {
             if (courses) {
                 courses.forEach(function (course) {
                     var tempCourse = {};
@@ -32,17 +36,19 @@ module.exports = function(app) {
         });
     });
 
-	app.get('/course/:courseCode', function(req, res) {
+	app.get('/course/:courseCode/:title', function(req, res) {
 		var courseCode = req.params.courseCode;
-		Course.where({courseCode: courseCode}).findOne().populate('sections').lean().exec(function (err, myCourse) {
+        var title = req.params.title;
+		Course.where({courseCode: courseCode, title: title}).findOne().populate('sections').lean().exec(function (err, myCourse) {
             if (err) {
                         res.json({
-                            status: 409,
+                            status: 404,
                             msg: "Errors when trying to find the course for enrollment"
                         })
             } else if (myCourse) {
             	// Populating catalog
                 Section.populate(myCourse['sections'], {path: 'catalogs'}, function (err, data) {
+
                     res.send(JSON.parse(JSON.stringify(myCourse)));
                 });
            	}

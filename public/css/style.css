@@ -54,11 +54,8 @@ MAIN - SEARCH SIDE BAR
 
 }
 
-.bold {
+.section .title, .lecture .title {
     font-weight: bold;
-}
-
-.margin {
     margin: 5px 0 0 0;
 }
 
@@ -85,7 +82,8 @@ MAIN - SEARCH SIDE BAR
     border-color: #E7E7E7;
 }
 
-.section {
+
+.content {
     display: -moz-inline-stack;
     display: inline-block;
     margin-right: 2px;
