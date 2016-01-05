@@ -13,7 +13,7 @@ module.exports = function(app) {
 	app.get('/allCourses', function(req, res) {
         var allCourses = [];
         var i = 1;
-        Course.find({courseCode: new RegExp(req.query.term, "i")}, function (err, courses) {
+        Course.find({courseCode: new RegExp(req.query.term.replace(/\s+/g, ''), "i")}, function (err, courses) {
             if (courses) {
                 courses.forEach(function (course) {
                     var tempCourse = {};
