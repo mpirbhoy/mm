@@ -124,7 +124,7 @@ function getCourseTitleInfo(inputString) {
         return null;
     }
 
-    //Swapping for standard whitespaces 
+    //Swapping for standard whitespaces
     inputString = inputString.replace("   ", " ").replace("  ", " ");
 
     var FacCode = inputString.split("/")[0];
@@ -198,9 +198,9 @@ function doStupidShit(callback) {
 
     var prereqs;
     if (( prereqBeginIndex == 0 && prereqEndIndex == allData.rows[i][dataFields.COURSE_DESC].length ) || indexOfFirstPrereq >= indexofFirstCourseExclusion ) {
-       prereqs = "";
+        prereqs = "";
     } else {
-       prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(prereqBeginIndex, prereqEndIndex);
+        prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(prereqBeginIndex, prereqEndIndex);
     }
 
     // exclusions
@@ -384,9 +384,9 @@ function doStupidShit(callback) {
                          myCourse.sections[sectionIndex] = data;
                          myCourse.save();*/
                         //ADD CATALOG 0TO SECTION
-                    /*myCourse.sections[sectionIndex].catalogs.push(newCatalog);
-                        //SAVE
-                    myCourse.save();*/
+                        /*myCourse.sections[sectionIndex].catalogs.push(newCatalog);
+                         //SAVE
+                         myCourse.save();*/
                         data[sectionIndex].catalogs.push(newCatalog);
                         data[sectionIndex].save();
                         callback();
@@ -408,16 +408,16 @@ function doStupidShit(callback) {
                 newCatalog.save();
 
                 //CREATE SECTION AND ADD CATALOG TO SECTION
-                    var newSection = new Section({
+                var newSection = new Section({
                     sectionCode: sectionCode,
                     term: term,
                     sectionMeetings: [],
                     sectionDirector: sectionDirector,
                     instructors: sectionInstructors,
                     catalogs: [newCatalog],
-                        debug_course: courseCode
+                    debug_course: courseCode
 
-                    });
+                });
                 newSection.save();
 
                 //CREATE COURSE AND ADD SECTION TO COURSE
