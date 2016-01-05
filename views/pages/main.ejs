@@ -56,7 +56,7 @@
         $(".select2").select2({
             placeholder: "Select courses",
             ajax: {
-                url: "/allcourses",
+                url: "/allCourses",
                 dataType: 'json',
                 delay: 250,
                 data: function (params) {
@@ -77,7 +77,7 @@
                 cache: true
             },
             escapeMarkup: function (markup) { return markup; }, // let the custom formatter work
-            minimumInputLength: 0,
+            minimumInputLength: 3,
             templateResult: formatCourse,
             templateSelection: formatCourseSelection
         });
@@ -116,44 +116,44 @@
 
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
-            var courseInst = JSON.parse(args).data['instructors'];
             var coursePre = JSON.parse(args).data['prereqs'];
             var courseExc = JSON.parse(args).data['exclusions'];
-            var section = JSON.parse(args).data['threads'];
-            console.log(JSON.parse(args).data);
+
 
             $.ajax({
-                type: "POST",
+                type: "GET",
                 url: "/course/" + courseCode,
                 dataType: 'json',
-                data: {courseCode: courseCode},
                 success: function(data) {
+                    var section = data.sections;
                     if (data.status != 409) {
                         var msg = '<div class="panel panel-default">'+
-                                '<button data-toggle="collapse" data-parent="#accordion" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                                '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-                        msg += "Programming in a language such as Python. Elementary data types, lists, maps.  Program structure: control flow, functions, classes, objects, methods. Algorithms and problem solving. Searching, sorting, and complexity. Unit testing. No prior programming experience required.<br>";
+                        msg += data.note + "<br>";
                         if (coursePre) {
                             msg += "<span class='bold'> PRE: </span>" + coursePre + "<br>";
                         }
                         if (courseExc) {
                             msg += "<span class='bold'> EXC: </span>" + courseExc + "<br>";
                         }
-                        msg += "<span class='bold'> INSTR: </span>" + courseInst + "<br>";
                         msg += "<div class='margin'><span class='bold'>SECTION: </span>";
                         section.forEach(function (lec) {
-                            msg += "<div  class='section'>" + JSON.parse(lec).name + "</div>";
-                            msg += "<div class='time' style='display:none;'>" + JSON.parse(lec).timings[0].day + "/" + JSON.parse(lec).timings[0].startTime + "/" + JSON.parse(lec).timings[0].endTime + "/" + JSON.parse(lec).timings[0].location + "</div>";
-                            console.log(JSON.parse(lec).timings[0].day + "/" + JSON.parse(lec).timings[0].startTime + "/" + JSON.parse(lec).timings[0].endTime + "/" + JSON.parse(lec).timings[0].location);
+                            msg += "<div  class='section'>" + lec.sectionCode + "</div>";
                         });
+//
+//                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
+//                        console.log(lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location);
 
-                        msg += "<br><span class='bold'>MAIN: </span>LEC0501<br>"+
-                                "<span class='bold'>SECONDARY: </span><div class='section'>LAB01</div><div class='section'>LAB02</div><div class='section'>LAB03</div><br>"+
-                                "<span class='bold'>Catalog #:</span><br><br>" +
-                                '<div class="progress" style="margin-top:5px"><div class="progress-bar" role="progressbar"aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width:40%"></div></div>';
+//                        var courseInst = JSON.parse(args).data['instructors'];
+//                        msg += "<span class='bold'> INSTR: </span>" + courseInst + "<br>";
+//                        msg += "<br><span class='bold'>MAIN: </span>LEC0501<br>"+
+//                                "<span class='bold'>SECONDARY: </span><div class='section'>LAB01</div><div class='section'>LAB02</div><div class='section'>LAB03</div><br>"+
+//                                "<span class='bold'>Catalog #:</span><br><br>" +
+//                                '<div class="progress" style="margin-top:5px"><div class="progress-bar" role="progressbar"aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width:40%"></div></div>';
 
 
-                        msg += '</div>';
+                        msg += '</div></div></div>';
                         $('#courses').prepend(msg);
                         courseCount++;
                     }
@@ -163,6 +163,51 @@
             });
             $(".select2").val('').trigger('change');
         }
+
+        $('body').on('click', '#section', function() {
+            $.ajax({
+                type: "GET",
+                url: "/course/" + courseCode,
+                dataType: 'json',
+                success: function(data) {
+                    var section = data.sections;
+                    if (data.status != 409) {
+                        var msg = '<div class="panel panel-default">'+
+                                '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                                '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+                        msg += data.note + "<br>";
+                        if (coursePre) {
+                            msg += "<span class='bold'> PRE: </span>" + coursePre + "<br>";
+                        }
+                        if (courseExc) {
+                            msg += "<span class='bold'> EXC: </span>" + courseExc + "<br>";
+                        }
+                        msg += "<div class='margin'><span class='bold'>SECTION: </span>";
+                        section.forEach(function (lec) {
+                            msg += "<div  class='section'>" + lec.sectionCode + "</div>";
+                        });
+//
+//                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
+//                        console.log(lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location);
+
+//                        var courseInst = JSON.parse(args).data['instructors'];
+//                        msg += "<span class='bold'> INSTR: </span>" + courseInst + "<br>";
+//                        msg += "<br><span class='bold'>MAIN: </span>LEC0501<br>"+
+//                                "<span class='bold'>SECONDARY: </span><div class='section'>LAB01</div><div class='section'>LAB02</div><div class='section'>LAB03</div><br>"+
+//                                "<span class='bold'>Catalog #:</span><br><br>" +
+//                                '<div class="progress" style="margin-top:5px"><div class="progress-bar" role="progressbar"aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width:40%"></div></div>';
+
+
+                        msg += '</div></div></div>';
+                        $('#courses').prepend(msg);
+                        courseCount++;
+                    }
+                },
+                fail: function() {
+                }
+            });
+            $(".select2").val('').trigger('change');
+        });
 
         var source = [];
         var sourceClicked = [];
@@ -238,32 +283,32 @@
         //for (var i = 0; i < courses.length; i++) {
         //    $('#courses').prepend("<button type='submit' class='list-group-item' value=" + courses[i].courseCode + "><span id='close'>x</span>  " + courses[i].courseCode + ": " + courses[i].courseName + "</button>");
         //};
-        //$('body').on('click', '.list-group-item', function(e) {
-        //    e.preventDefault();
-        //    var $this = $(this);
-        //    if (!$this.hasClass('active')) {
-        //        // remove all other active buttons
-        //        $(".list-group-item").each(function () {$(this).removeClass('active')});
-        //        $this.addClass('active');
-        //        $('.suggested-ads').remove();
-        //    }
-        //});
+        $('body').on('click', '.list-group-item', function(e) {
+            e.preventDefault();
+            var $this = $(this);
+            if (!$this.hasClass('active')) {
+                // remove all other active buttons
+                $(".list-group-item").each(function () {$(this).removeClass('active')});
+                $this.addClass('active');
+                $('.suggested-ads').remove();
+            }
+        });
 
         // Delete a selected course from the sidebar
         $('body').on('click', '#close', function(){
-//            $(this).closest('button').remove();
-            $form = $(this).closest('form');
-            $button = $(this).closest('button');
-
-            $.ajax({
-                type: "DELETE",
-                url: "/course/" + $(this).closest('button').attr('value'),
-                success: function(data) {
-                    window.location.reload();
-                },
-                fail: function() {
-                }
-            });
+            $(this).closest('.panel').remove();
+//            $form = $(this).closest('form');
+//            $button = $(this).closest('button');
+//
+//            $.ajax({
+//                type: "DELETE",
+//                url: "/course/" + $(this).closest('button').attr('value'),
+//                success: function(data) {
+//                    window.location.reload();
+//                },
+//                fail: function() {
+//                }
+//            });
         })
 
         // Initiate fall calender
