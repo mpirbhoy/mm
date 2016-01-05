@@ -12,10 +12,10 @@ module.exports = function(app) {
 
 	app.get('/allCourses', function(req, res) {
         var allCourses = [];
-
+        var i = 1;
         Course.find({courseCode: new RegExp(req.query.term, "i")}, function (err, courses) {
             if (courses) {
-                courses.forEach(function (course, i) {
+                courses.forEach(function (course) {
                     var tempCourse = {};
                     tempCourse.id = i;
                     tempCourse.courseCode = course.courseCode;
