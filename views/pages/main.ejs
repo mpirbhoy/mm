@@ -116,9 +116,6 @@
 
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
-            var coursePre = JSON.parse(args).data['prereqs'];
-            var courseExc = JSON.parse(args).data['exclusions'];
-
 
             $.ajax({
                 type: "GET",
@@ -126,21 +123,21 @@
                 dataType: 'json',
                 success: function(data) {
                     localStorage[courseCode] = JSON.stringify(data);
-                    var section = data.sections;
+                    var sections = data.sections;
                     if (data.status != 409) {
                         var msg = '<div class="panel panel-default">'+
                                 '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
                         msg += data.note + "<br>";
-                        if (coursePre) {
-                            msg += "<span class='bold'> PRE: </span>" + coursePre + "<br>";
+                        if (data.prereqs) {
+                            msg += "<span class='bold'> PRE: </span>" + data.prereqs + "<br>";
                         }
-                        if (courseExc) {
-                            msg += "<span class='bold'> EXC: </span>" + courseExc + "<br>";
+                        if (data.exclusions) {
+                            msg += "<span class='bold'> EXC: </span>" + data.exclusions + "<br>";
                         }
                         msg += "<div class='margin'><span class='bold'>SECTION: </span>";
-                        section.forEach(function (lec) {
-                            msg += "<div  class='section'>" + lec.sectionCode + "</div>";
+                        sections.forEach(function (section) {
+                            msg += "<div  class='section'>" + section.sectionCode + "</div>";
                         });
 //
 //                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
@@ -167,10 +164,44 @@
 
         $('body').on('click', '.section', function() {
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
+            var $sectionSelected = $(this).text();
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
-                console.log(data);
+                var sections = data.sections;
+                var msg = "<div class='margin'><span class='bold'>MAIN: </span>";
+
+                sections.forEach(function (section) {
+                    if (section.sectionCode === $sectionSelected) {
+                        console.log(section.sectionMeetings.length);
+                        if (section.sectionMeetings.length === 0 && section.catalogs.length === 1) {
+                            msg += "<div  class='lecture'>" + section.catalogs[0].meeting.type + "</div></div>";
+                        }
+                    };
+                });
+
+
+//                var msg = '<div class="panel panel-default">'+
+//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+//                msg += data.note + "<br>";
+
+
+
+
+
+//                catalogs.forEach(function (lecture) {
+//                    msg += "<div  class='section'>" + lecture.sectionCode + "</div>";
+//                });
+
+                if( $('.lecture').length ) {        // use this if you are using class to check
+                    console.log($('.panel-body'));
+                    $('.panel-body').append(msg);
+                } else {
+                    $('.panel-body').append(msg);
+                }
+
+
             }
         });
 

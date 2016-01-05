@@ -99,6 +99,20 @@ MAIN - SEARCH SIDE BAR
     zoom: 1;
 }
 
+.lecture {
+    display: -moz-inline-stack;
+    display: inline-block;
+    margin-right: 2px;
+    margin-left: 2px;
+    padding-right: 1px;
+    padding-left: 1px;
+    border: 1px solid green;
+    color: green;
+    cursor: pointer;
+    -ms-zoom: 1;
+    zoom: 1;
+}
+
 button {
     line-height: 10px;
 }
