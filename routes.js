@@ -11,6 +11,10 @@ module.exports = function(app) {
 	});
 
 	app.get('/allCourses', function(req, res) {
+        if (req.query.term == null || req.query.size == 0) {
+            res.status(404);
+            return;
+        }
         var allCourses = [];
         var i = 1;
         Course.find({courseCode: new RegExp(req.query.term.replace(/\s+/g, ''), "i")}, function (err, courses) {
