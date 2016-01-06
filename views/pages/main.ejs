@@ -39,6 +39,8 @@
     </div>
 </div>
 
+
+
 <script>
     $(document).ready(function() {
         // Initiate localStorage
@@ -167,7 +169,8 @@
 //                                '<div class="progress" style="margin-top:5px"><div class="progress-bar" role="progressbar"aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width:40%"></div></div>';
 
 
-                        msg += '</div></div></div>';
+                        msg += '</div>'
+                        msg += '<div class="result"></div></div></div>';
                         $('#courses').prepend(msg);
                         courseCount++;
                     }
@@ -217,40 +220,28 @@
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
                 var sections = data.sections;
-                var msg = "<div class='lecture'><span class='title'>MAIN: </span>";
+                var msg = "<div class='fMeeting'><span class='title'>CHOOSE ALL: </span>";
 
                 sections.forEach(function (section) {
-//                    console.log(section.sectionCode === $sectionSelected);
                     if (section.sectionCode === $sectionSelected) {
-                        if (section.sectionMeetings.length === 0 && section.catalogs.length === 1) {
-                            msg += "<div  class='content'>" + section.catalogs[0].meeting.type + "</div></div>";
-                        } else if (section.sectionMeetings.length > 1) {
+                        if (section.fixedMeetings.length > 0) {
+                            section.fixedMeetings.forEach(function(fMeeting) {
+                                msg += "<div  class='content'>" + fMeeting.type + "</div>";
+                            })
+                        }
+                        msg+="</div>";
+
+                        if (section.varyingMeetings.length > 0) {
+                            msg += "<div class='vMeeting'><span class='title'>CHOOSE ONE: </span>";
+                            section.varyingMeetings.forEach(function(vMeeting) {
+                                msg += "<div  class='content'>" + vMeeting.type + "</div>";
+                            })
 
                         }
+                        msg+="</div>";
                     }
                 });
-
-
-//                var msg = '<div class="panel panel-default">'+
-//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-//                msg += data.note + "<br>";
-
-
-
-
-
-//                catalogs.forEach(function (lecture) {
-//                    msg += "<div  class='section'>" + lecture.sectionCode + "</div>";
-//                });
-
-                if( $('.lecture').length ) {        // use this if you are using class to check
-                    $('.lecture').replaceWith(msg);
-                } else {
-                    $('.panel-body').append(msg);
-                }
-
-
+                $this.closest('.panel-body').find('.result').html(msg);
             }
         });
 
@@ -291,12 +282,20 @@
 //            }
 //        }, '.section');
 
-        // Add lecture session on calendar
-        $('body').on('click', '.lecture .content', function(e) {
+        // Add fixed meeting section on calendar
+        $('body').on('click', '.fMeeting .content', function(e) {
             $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
             sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
-            var $sectionSelected = $(this).parent().prev().find('.selected').text();
+            var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+
+            var $this = $(this);
+            if (!$this.hasClass('selected')) {
+                // remove all other active buttons
+                $(".fMeeting .content").each(function () {$(this).removeClass('selected')});
+                $this.addClass('selected');
+            }
+
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
@@ -304,13 +303,13 @@
 
                 sections.forEach(function (section) {
                     if (section.sectionCode === $sectionSelected) {
-                        var catalogs =  section.catalogs;
-                        catalogs.forEach(function (catalog) {
-                            var meetingTime = catalog.meeting.timings;
+                        var fixedMeetings =  section.fixedMeetings;
+                        fixedMeetings.forEach(function (fMeeting) {
+                            var meetingTime = fMeeting.timings;
                             meetingTime.forEach(function (time) {
                                 sourceClicked.push({
                                     id: $courseCode,
-                                    title: $courseCode+'\n'+catalog.meeting.type,
+                                    title: $courseCode+'\n'+ fMeeting.type,
                                     start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
                                     end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
                                     color:'#4fd84a'
@@ -344,6 +343,46 @@
             }
             return date;
         }
+
+        // Add fixed meeting section on calendar
+        $('body').on('click', '.vMeeting .content', function(e) {
+            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+            sourceClicked = [];
+            var $courseCode = $(this).closest('.panel').find('button').attr('value');
+            var $sectionSelected = $(this).parent().prev().find('.selected').text();
+
+            var $this = $(this);
+            if (!$this.hasClass('selected')) {
+                // remove all other active buttons
+                $(".vMeeting .content").each(function () {$(this).removeClass('selected')});
+                $this.addClass('selected');
+            }
+
+            if (localStorage.getItem($courseCode) === null) {
+            } else {
+                var data = JSON.parse(localStorage.getItem($courseCode));
+                var sections = data.sections;
+
+                sections.forEach(function (section) {
+                    if (section.sectionCode === $sectionSelected) {
+                        var catalogs =  section.catalogs;
+                        catalogs.forEach(function (catalog) {
+                            var meetingTime = catalog.meeting.timings;
+                            meetingTime.forEach(function (time) {
+                                sourceClicked.push({
+                                    id: $courseCode,
+                                    title: $courseCode+'\n'+catalog.meeting.type,
+                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
+                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
+                                    color:'#4fd84a'
+                                });
+                            })
+                        })
+                    }
+                });
+            }
+            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
+        });
 
 
 
@@ -423,35 +462,7 @@
             }
         ] );
 
-        $('#calendar').fullCalendar( 'addEventSource', [
-            {
-                title: 'CSC343\nLEC0101',
-                start: '2015-12-21T15:00:00',
-                end: '2015-12-21T16:00:00',
-                color:'#ff9b00'
-            },
-            {
-                title: 'CSC343\nLEC0101',
-                start: '2015-12-23T15:00:00',
-                end: '2015-12-23T16:00:00',
-                color:'#ff9b00'
-            },
-            {
-                title: 'CSC343\nLEC0101',
-                start: '2015-12-25T15:00:00',
-                end: '2015-12-25T16:00:00',
-                color:'#ff9b00'
-            },
-        ] );
 
-        $('#calendar').fullCalendar( 'addEventSource', [
-            {
-                title: 'MAT301\nLEC0101',
-                start: '2015-12-23T18:00:00',
-                end: '2015-12-23T21:00:00',
-                color:'#4fd84a'
-            }
-        ] );
         $('#calendar').fullCalendar('refetchEvents');
 
 

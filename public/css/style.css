@@ -54,9 +54,13 @@ MAIN - SEARCH SIDE BAR
 
 }
 
-.section .title, .lecture .title {
+.section .title, .fMeeting .title, .vMeeting .title {
     font-weight: bold;
     margin: 5px 0 0 0;
+}
+
+.section, .fMeeting {
+    margin-bottom: 5px;
 }
 
 .panel {
@@ -86,8 +90,7 @@ MAIN - SEARCH SIDE BAR
 .content {
     display: -moz-inline-stack;
     display: inline-block;
-    margin-right: 2px;
-    margin-left: 2px;
+    margin: 2px;
     padding-right: 1px;
     padding-left: 1px;
     border: 1px solid green;
@@ -97,7 +100,7 @@ MAIN - SEARCH SIDE BAR
     zoom: 1;
 }
 
-.section .content.selected {
+.section .content.selected, .fMeeting .content.selected, .vMeeting .content.selected {
     border: 1px solid green;
     background-color: green;
     color: #fff;
