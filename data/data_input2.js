@@ -124,7 +124,7 @@ function getCourseTitleInfo(inputString) {
         return null;
     }
 
-    //Swapping for standard whitespaces 
+    //Swapping for standard whitespaces
     inputString = inputString.replace("   ", " ").replace("  ", " ");
 
     var FacCode = inputString.split("/")[0];
@@ -168,46 +168,69 @@ function doStupidShit(callback) {
 
 
     //Courses
-    console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    console.log(i);
+    //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
+    //console.log(i);
     var courseCode = arrayCourseTitleInfo.courseCode; //String
-    console.log(courseCode);
+    //console.log(courseCode);
     var facultyCode = arrayCourseTitleInfo.facCode; //String
-    console.log(facultyCode);
+    //console.log(facultyCode);
     var courseName = arrayCourseTitleInfo.courseName;  //String
-    console.log(courseName);
+    //console.log(courseName);
+
+
+
+
+    // Begin course descriptions
 
     var indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Prereq");
-    var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
+    if (indexOfFirstPrereq == -1) indexOfFirstPrereq = allData.rows[i][dataFields.COURSE_DESC].indexOf("Conditions préalables");// For course descriptions in French
 
-    var prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(indexOfFirstPrereq, indexofFirstCourseExclusion); //[String]
-    console.log(prereqs);
-    var exclusions = allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion); //[String]
-    console.log('------------------------------------');
-    console.log(exclusions);
-    var courseNote = allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq); //String
-    console.log('------------------------------------');
-    console.log(courseNote);
+    var indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Course credit exclusion");
+    if (indexofFirstCourseExclusion == -1) indexofFirstCourseExclusion = allData.rows[i][dataFields.COURSE_DESC].indexOf("Cours incompatibles");// For course descriptions in French
+
+
+    // *** prereq.....
+    var prereqBeginIndex = 0;
+    var prereqEndIndex = allData.rows[i][dataFields.COURSE_DESC].length;
+
+    if (indexOfFirstPrereq != -1) prereqBeginIndex = indexOfFirstPrereq;
+    if (indexofFirstCourseExclusion != -1) prereqEndIndex = indexofFirstCourseExclusion;
+
+    var prereqs;
+    if (( prereqBeginIndex == 0 && prereqEndIndex == allData.rows[i][dataFields.COURSE_DESC].length ) || indexOfFirstPrereq >= indexofFirstCourseExclusion ) {
+        prereqs = "";
+    } else {
+        prereqs = allData.rows[i][dataFields.COURSE_DESC].substring(prereqBeginIndex, prereqEndIndex);
+    }
+
+    // exclusions
+    var exclusions = indexofFirstCourseExclusion != -1 ? allData.rows[i][dataFields.COURSE_DESC].substring(indexofFirstCourseExclusion) : ""; //[String]
+
+    var courseNote = prereqs != ""  ? allData.rows[i][dataFields.COURSE_DESC].substring(0, indexOfFirstPrereq) : allData.rows[i][dataFields.COURSE_DESC]; //String
+
+    // *** end course description
+
+
 
     //Sections
     var sectionCode = getSectionCode(allData.rows[i][dataFields.TERM_AND_SECTION]);
-    console.log(sectionCode);
+    //console.log(sectionCode);
     var term = getTerm(allData.rows[i][dataFields.TERM_AND_SECTION]);
-    console.log(term);
+    //console.log(term);
     var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
-    console.log(sectionDirector);
+    //console.log(sectionDirector);
     var sectionInstructors = allData.rows[i][dataFields.REQ_MEETING_INSTRUCTOR];
-    console.log(sectionInstructors);
+    //console.log(sectionInstructors);
     var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION], allData.rows[i][dataFields.REQ_MEETING_TYPE]);
-    console.log(sectionMeeting);
+    //console.log(sectionMeeting);
 
     //Catalogs
     var catalogCode = allData.rows[i][dataFields.CAT_NUM];
-    console.log(catalogCode);
+    //console.log(catalogCode);
     var catalogInstructors = allData.rows[i][dataFields.VARY_MEETING_INSTRUCTOR];
-    console.log(catalogInstructors);
+    //console.log(catalogInstructors);
     var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION], allData.rows[i][dataFields.VARY_MEETING_TYPE]);
-    console.log(catalogMeeting);
+    //console.log(catalogMeeting);
 
     //If current row is not a catalog
     if (!allData.rows[i][dataFields.CAT_NUM]) {
@@ -361,9 +384,9 @@ function doStupidShit(callback) {
                          myCourse.sections[sectionIndex] = data;
                          myCourse.save();*/
                         //ADD CATALOG 0TO SECTION
-                    /*myCourse.sections[sectionIndex].catalogs.push(newCatalog);
-                        //SAVE
-                    myCourse.save();*/
+                        /*myCourse.sections[sectionIndex].catalogs.push(newCatalog);
+                         //SAVE
+                         myCourse.save();*/
                         data[sectionIndex].catalogs.push(newCatalog);
                         data[sectionIndex].save();
                         callback();
@@ -385,16 +408,16 @@ function doStupidShit(callback) {
                 newCatalog.save();
 
                 //CREATE SECTION AND ADD CATALOG TO SECTION
-                    var newSection = new Section({
+                var newSection = new Section({
                     sectionCode: sectionCode,
                     term: term,
                     sectionMeetings: [],
                     sectionDirector: sectionDirector,
                     instructors: sectionInstructors,
                     catalogs: [newCatalog],
-                        debug_course: courseCode
+                    debug_course: courseCode
 
-                    });
+                });
                 newSection.save();
 
                 //CREATE COURSE AND ADD SECTION TO COURSE

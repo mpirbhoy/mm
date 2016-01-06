@@ -203,6 +203,14 @@
                 } else {
                     localStorage[courseCode][doStuff].selection.section = $sectionSelected;
                 }
+
+
+            var $this = $(this);
+            if (!$this.hasClass('selected')) {
+                // remove all other active buttons
+                $(".section .content").each(function () {$(this).removeClass('selected')});
+                $this.addClass('selected');
+
             }
 
             if (localStorage.getItem($courseCode) === null) {
@@ -285,15 +293,16 @@
 
         // Add lecture session on calendar
         $('body').on('click', '.lecture .content', function(e) {
+            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+            sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
-            var $sectionSelected;
+            var $sectionSelected = $(this).parent().prev().find('.selected').text();
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
                 var sections = data.sections;
 
                 sections.forEach(function (section) {
-//                    console.log(section.sectionCode === $sectionSelected);
                     if (section.sectionCode === $sectionSelected) {
                         var catalogs =  section.catalogs;
                         catalogs.forEach(function (catalog) {
@@ -302,8 +311,8 @@
                                 sourceClicked.push({
                                     id: $courseCode,
                                     title: $courseCode+'\n'+catalog.meeting.type,
-                                    start: convertDayToDate(time.day) + 'T' + time.startTime,
-                                    end: convertDayToDate(time.day) + 'T' + time.endTime,
+                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
+                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
                                     color:'#4fd84a'
                                 });
                             })
@@ -333,7 +342,6 @@
                     date += 25;
                     break;
             }
-            console.log(date);
             return date;
         }
 
