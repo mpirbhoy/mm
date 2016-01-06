@@ -113,7 +113,7 @@
             }
 
             var $email = $('#user-nav').attr('href');
-
+            var courseExists = false;
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
 
@@ -122,9 +122,25 @@
                 url: "/course/" + courseCode + "/" + courseName,
                 dataType: 'json',
                 success: function(data) {
-                    localStorage[courseCode] = JSON.stringify(data);
+                    if (localStorage[courseCode] == null) {
+                        localStorage[courseCode] = JSON.stringify([{title: courseName, data: data, selection: {}}]);
+                    } else {
+                        var temp = JSON.parse(localStorage[courseCode]);
+                        for (var i = 0; i < temp.length; i++) {
+                            if (temp[i].title == data.title) {
+                                courseExists = true;
+                            }
+                        }
+                        if (!courseExists) {
+                            temp.push({title: courseName, data: data, selection: {}});
+                            localStorage[courseCode] = JSON.stringify(temp);
+                        }
+
+
+                    }
+
                     var sections = data.sections;
-                    if (data.status != 409) {
+                    if (data.status != 409 && !courseExists) {
                         var msg = '<div class="panel panel-default">'+
                                 '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
@@ -165,6 +181,30 @@
         $('body').on('click', '.section .content', function() {
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).text();
+            var raw1 = $(this).closest('.panel').find('button').text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var doStuff = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    doStuff = i;
+                }
+            }
+            if (doStuff != -1) {
+                //If selection is empty
+                if (Object.keys(localStorage[courseCode][doStuff].selection).length == 0) {
+                    var temp = {};
+                    temp.section = $sectionSelected;
+                    localStorage[courseCode][doStuff].selection = temp;
+                //Selection is not empty
+                } else {
+                    localStorage[courseCode][doStuff].selection.section = $sectionSelected;
+                }
+            }
+
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
@@ -316,6 +356,22 @@
 
         // Delete a selected course from the sidebar
         $('body').on('click', '#close', function(){
+            var raw1 = $(this).parent().text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var toDel = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    toDel = i;
+                }
+            }
+            if (toDel != -1) {
+                temp.splice(toDel, 1);
+            }
+            localStorage[courseCode] = JSON.stringify(temp);
             $(this).closest('.panel').remove();
 //            $form = $(this).closest('form');
 //            $button = $(this).closest('button');
