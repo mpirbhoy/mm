@@ -11,7 +11,7 @@ module.exports = function(app) {
 	});
 
 	app.get('/allCourses', function(req, res) {
-        if (req.query.term == null || req.query.term.length <= 3) {
+        if (req.query.term == null || req.query.term.length < 3) {
             res.status(404).send('Try longer query');
             return;
         }
