@@ -97,6 +97,12 @@ MAIN - SEARCH SIDE BAR
     zoom: 1;
 }
 
+.section .content.selected {
+    border: 1px solid green;
+    background-color: green;
+    color: #fff;
+}
+
 button {
     line-height: 10px;
 }
