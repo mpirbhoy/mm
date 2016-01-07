@@ -491,14 +491,38 @@
 
 
         var loadCount = 1;
+        var loadMsg = "";
         for (var key in localStorage) {
             var course = JSON.parse(localStorage[key]);
             course.forEach(function(data) {
                 var courseCode = key;
                 var courseName = data.title;
-                var section = data.sections;
-                console.log(data);
-            })
+                var courseData = data.data;
+                var sections = courseData.sections;
+                console.log(sections);
+
+                loadMsg = '<div class="panel panel-default">' +
+                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+                loadMsg += courseData.note + "<br>";
+
+                if (courseData.prereqs) {
+                    loadMsg += "<span class='title'> PRE: </span>" + courseData.prereqs + "<br>";
+                }
+                if (courseData.exclusions) {
+                    loadMsg += "<span class='title'> EXC: </span>" + courseData.exclusions + "<br>";
+                }
+                loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
+                sections.forEach(function (section) {
+                    loadMsg += "<div  class='content'>" + section.sectionCode + "</div>";
+                });
+
+                loadMsg += '</div>'
+                loadMsg += '<div class="result"></div></div></div>';
+                $('#courses').prepend(loadMsg);
+                courseCount++;
+
+            });
 //            console.log(sections);
 //            if (data.status != 409 && !courseExists) {
 //                var msg = '<div class="panel panel-default">' +
