@@ -137,10 +137,13 @@ button {
 .main {font-size: 11px;}
 
 .fc-time-grid-event {
-    padding: 7px;
+    /*padding: 7px;*/
     font-size: 1.05em;
-    text-align: center;
-    vertical-align: middle;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
+    display : flex;
+    align-items : center;
+    justify-content: center;
 }
 
 .select2-result-repository { padding-top: 4px; padding-bottom: 3px; }

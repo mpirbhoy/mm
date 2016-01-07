@@ -46,7 +46,7 @@
         // Initiate localStorage
         if (typeof(Storage) !== "undefined") {
             // Retrieve
-            console.log("Successful");
+            console.log("localStorage working");
         } else {
             alert("Your browser does not support Web Storage.\n (data is lost when the browser is closed.)");
         }
@@ -199,6 +199,7 @@
 
 
             var $this = $(this);
+            // Hightlight the section
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
                 $(".section .content").each(function () {
@@ -258,6 +259,7 @@
 
 
             } else {
+                // Dehighlight the section
                 $(this).removeClass('selected');
                 $(this).parent().next().empty();
             }
@@ -302,15 +304,12 @@
 
         // Add fixed meeting section on calendar
         $('body').on('click', '.fMeeting .content', function(e) {
-            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
-            sourceClicked = [];
+//            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+//            sourceClicked = [];
 
             var $this = $(this);
+            // Hightlight the fixedMeeting
             if (!$this.hasClass('selected')) {
-                // remove all other active buttons
-                $(".fMeeting .content").each(function () {
-                    $(this).removeClass('selected');
-                });
                 $this.addClass('selected');
 
                 var $courseCode = $(this).closest('.panel').find('button').attr('value');
@@ -344,24 +343,27 @@
                                 if (section.sectionCode === $sectionSelected) {
                                     var fixedMeetings = section.fixedMeetings;
                                     fixedMeetings.forEach(function (fMeeting) {
-                                        var meetingTime = fMeeting.timings;
-                                        meetingTime.forEach(function (time) {
-                                            sourceClicked.push({
-                                                id: $courseCode,
-                                                title: $courseCode + '\n' + fMeeting.type,
-                                                start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
-                                                end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
-                                                color: '#4fd84a'
-                                            });
-                                        })
+                                        if (fMeeting.type === $meetingSelected) {
+                                            var meetingTime = fMeeting.timings;
+                                            meetingTime.forEach(function (time) {
+                                                sourceClicked.push({
+                                                    id: $courseCode,
+                                                    title: $courseCode + '\n' + fMeeting.type,
+                                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                                    color: '#4fd84a'
+                                                });
+                                            })
+                                        };
                                     })
                                 }
                             });
                         }
-                        $('#calendar').fullCalendar('addEventSource', sourceClicked);
                     })
+                    $('#calendar').fullCalendar('addEventSource', sourceClicked);
                 }
             } else {
+                // Dehighlight the fixedMeeting
                 $(this).removeClass('selected');
                 $('#calendar').fullCalendar('removeEventSource', sourceClicked);
             }
@@ -391,10 +393,11 @@
 
         // Add variable meeting section on calendar
         $('body').on('click', '.vMeeting .content', function(e) {
-            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
-            sourceClicked = [];
+//            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+//            sourceClicked = [];
 
             var $this = $(this);
+            // Hightlight the varyingMeeting
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
                 $(".vMeeting .content").each(function () {
@@ -433,24 +436,27 @@
                                 if (section.sectionCode === $sectionSelected) {
                                     var varyingMeetings = section.varyingMeetings;
                                     varyingMeetings.forEach(function (vMeeting) {
-                                        var meetingTime = vMeeting.timings;
-                                        meetingTime.forEach(function (time) {
-                                            sourceClicked.push({
-                                                id: $courseCode,
-                                                title: $courseCode + '\n' + vMeeting.type,
-                                                start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
-                                                end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
-                                                color: '#4fd84a'
-                                            });
-                                        })
+                                        if (vMeeting.type === $meetingSelected) {
+                                            var meetingTime = vMeeting.timings;
+                                            meetingTime.forEach(function (time) {
+                                                sourceClicked.push({
+                                                    id: $courseCode,
+                                                    title: $courseCode + '\n' + vMeeting.type,
+                                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                                    color: '#4fd84a'
+                                                });
+                                            })
+                                        }
                                     })
                                 }
                             });
                         }
-                        $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
                     })
+                    $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
                 }
             } else {
+                // Dehighlight the varingMeeting
                 $(this).removeClass('selected');
                 $('#calendar').fullCalendar('removeEventSource', sourceClicked);
             }
@@ -466,10 +472,9 @@
                 var courseName = data.title;
                 var courseData = data.data;
                 var sections = courseData.sections;
-                console.log(sections);
 
                 loadMsg = '<div class="panel panel-default">' +
-                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                        '<button data-toggle="collapse" data-target="#collapse' + loadCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                         '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
                 loadMsg += courseData.note + "<br>";
 
@@ -487,8 +492,7 @@
                 loadMsg += '</div>'
                 loadMsg += '<div class="result"></div></div></div>';
                 $('#courses').prepend(loadMsg);
-                courseCount++;
-
+                loadCount++;
             });
         }
 
@@ -547,7 +551,7 @@
                     header:false,
                     allDaySlot:false,
                     minTime: '08:00:00',
-                    maxTime: '21:00:00',
+                    maxTime: '22:00:00',
                     slotDuration: '00:15:00',
                     slotLabelInterval: '01:00:00',
                     slotEventOverlap: false
@@ -568,11 +572,7 @@
             }
         ] );
 
-
-        $('#calendar').fullCalendar('refetchEvents');
-
-
-        $('#calendar').fullCalendar('option', 'height', 720);
+        $('#calendar').fullCalendar('option', 'height', 760);
 
 
         // Initiate winter calender
@@ -583,14 +583,14 @@
                     header:false,
                     allDaySlot:false,
                     minTime: '08:00:00',
-                    maxTime: '21:00:00',
+                    maxTime: '22:00:00',
                     slotDuration: '00:15:00',
                     slotLabelInterval: '01:00:00',
                     slotEventOverlap: false
                 });
 
         $('#calendar2').fullCalendar('gotoDate', '2015-12-21');
-        $('#calendar2').fullCalendar('option', 'height', 720);
+        $('#calendar2').fullCalendar('option', 'height', 760);
     });
 </script>
 </body>
