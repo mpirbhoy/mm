@@ -231,9 +231,9 @@
                 }
             }
 
-//            if (temp[courseIndex].selection == $sectionSelected) {
-//                courseIndex = -1;
-//            }
+            if (temp[courseIndex].selection.section == $sectionSelected) {
+                courseIndex = -1;
+            }
 
 
 
@@ -368,6 +368,13 @@
                 }
             }
 
+            //Check if meeting Selected is already in the array
+            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {
+                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
+                    courseIndex = -1;
+                }
+            }
+
             var $this = $(this);
             // Hightlight the fixedMeeting
             if (!$this.hasClass('selected')) {
@@ -470,6 +477,13 @@
             for (var i = 0; i < temp.length; i++) {
                 if (temp[i].title == title) {
                     courseIndex = i;
+                }
+            }
+
+            //Check if meeting Selected is already in the array
+            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) {
+                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
+                    courseIndex = -1;
                 }
             }
 
