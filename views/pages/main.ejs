@@ -200,12 +200,18 @@
             if (courseIndex != -1) {
                 //If selection is empty
                 if (Object.keys(JSON.parse(localStorage[courseCode])[courseIndex].selection).length == 0) {
-                    var temp = {};
-                    temp.section = $sectionSelected;
-                    localStorage[courseCode][courseIndex].selection = temp;
-                    //Selection is not empty
+                    var temp2 = {};
+                    temp2.section = $sectionSelected;
+                    temp2.fMeetings = [];
+                    temp2.vMeetings = [];
+                    temp[courseIndex].selection = temp2;
+                    localStorage[courseCode] = JSON.stringify(temp);
+                    //Selection already exists
                 } else {
-                    localStorage[courseCode][courseIndex].selection.section = $sectionSelected;
+                    temp[courseIndex].selection.section = $sectionSelected;
+                    temp[courseIndex].selection.fMeetings = [];
+                    temp[courseIndex].selection.vMeetings = [];
+                    localStorage[courseCode] = JSON.stringify(temp);
                 }
             }
 
@@ -294,11 +300,25 @@
             sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
-            var $text = $(this).closest('.panel').find('button').text();
-            console.log($text);
-            console.log($(this).text());
+            var raw1 = $(this).closest('.panel').find('button').text();
+            var $meetingSelected = $(this).text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var courseIndex = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    courseIndex = i;
+                }
+            }
 
-
+            if (courseIndex != -1) {
+                    temp[courseIndex].selection.fMeeting.push($meetingSelected);
+                    localStorage[courseCode] = JSON.stringify(temp);
+            }
+            
             var $this = $(this);
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
@@ -388,6 +408,26 @@
             sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).parent().prev().find('.selected').text();
+            var raw1 = $(this).closest('.panel').find('button').text();
+            var $meetingSelected = $(this).text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var courseIndex = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    courseIndex = i;
+                }
+            }
+
+            if (courseIndex != -1) {
+                temp[courseIndex].selection.vMeeting.push($meetingSelected);
+                localStorage[courseCode] = JSON.stringify(temp);
+            }
+
+
 
             var $this = $(this);
             if (!$this.hasClass('selected')) {
