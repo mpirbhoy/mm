@@ -110,8 +110,6 @@
                     return value;
                 });
             }
-
-            var $email = $('#user-nav').attr('href');
             var courseExists = false;
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
@@ -144,11 +142,11 @@
                                 '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
                         msg += data.note + "<br>";
-                        if (data.prereqs) {
-                            msg += "<span class='title'> PRE: </span>" + data.prereqs + "<br>";
+                        if (data.prereqs[0].length > 0) {
+                            msg += "<span class='title'> PRE: </span>" + data.prereqs[0] + "<br>";
                         }
-                        if (data.exclusions) {
-                            msg += "<span class='title'> EXC: </span>" + data.exclusions + "<br>";
+                        if (data.exclusions[0].length > 0) {
+                            msg += "<span class='title'> EXC: </span>" + data.exclusions[0] + "<br>";
                         }
                         msg += "<div class='section'><span class='title'>SECTION: </span>";
                         sections.forEach(function (section) {
@@ -194,9 +192,9 @@
                 }
             }
 
-            if (temp[courseIndex].selection == $sectionSelected) {
-                courseIndex = -1;
-            }
+//            if (temp[courseIndex].selection == $sectionSelected) {
+//                courseIndex = -1;
+//            }
 
 
 
@@ -205,7 +203,36 @@
                 // remove all other active buttons
                 $(".section .content").each(function () {$(this).removeClass('selected')});
                 $this.addClass('selected');
+                if (localStorage.getItem($courseCode) === null) {
+                } else {
+                    var data = JSON.parse(localStorage.getItem($courseCode));
+                    data.forEach(function(course) {
+                        if (course.title === title) {
+                            var sections = course.data.sections;
+                            var msg = "<div class='fMeeting'><span class='title'>CHOOSE ALL: </span>";
+                            sections.forEach(function (section) {
+                                if (section.sectionCode === $sectionSelected) {
+                                    if (section.fixedMeetings.length > 0) {
+                                        section.fixedMeetings.forEach(function(fMeeting) {
+                                            msg += "<div  class='content'>" + fMeeting.type + "</div>";
+                                        })
+                                    }
+                                    msg+="</div>";
 
+                                    if (section.varyingMeetings.length > 0) {
+                                        msg += "<div class='vMeeting'><span class='title'>CHOOSE ONE: </span>";
+                                        section.varyingMeetings.forEach(function(vMeeting) {
+                                            msg += "<div  class='content'>" + vMeeting.type + "</div>";
+                                        });
+                                    }
+                                    msg+="</div>";
+                                }
+                            });
+                            msg+= "<div class='catalog'><span class='title'>CATALOG#: </span><div  class='number'></div></div>";
+                            $this.closest('.panel-body').find('.result').html(msg);
+                        }
+                    });
+                }
                 //Adds section to localStorage
                 if (courseIndex != -1) {
                     //If selection is empty
@@ -225,43 +252,12 @@
                     }
                 }
 
+
+
+
             } else {
                 $(this).removeClass('selected');
                 $(this).parent().next().empty();
-                return;
-            }
-
-            if (localStorage.getItem($courseCode) === null) {
-            } else {
-                var data = JSON.parse(localStorage.getItem($courseCode));
-                data.forEach(function(course) {
-                    if (course.title === title) {
-                        var sections = course.data.sections;
-                        var msg = "<div class='fMeeting'><span class='title'>CHOOSE ALL: </span>";
-                        sections.forEach(function (section) {
-                            if (section.sectionCode === $sectionSelected) {
-                                if (section.fixedMeetings.length > 0) {
-                                    section.fixedMeetings.forEach(function(fMeeting) {
-                                        msg += "<div  class='content'>" + fMeeting.type + "</div>";
-                                    })
-                                }
-                                msg+="</div>";
-
-                                if (section.varyingMeetings.length > 0) {
-                                    msg += "<div class='vMeeting'><span class='title'>CHOOSE ONE: </span>";
-                                    section.varyingMeetings.forEach(function(vMeeting) {
-                                        msg += "<div  class='content'>" + vMeeting.type + "</div>";
-                                    });
-
-                                }
-                                msg+="</div>";
-                            }
-                        });
-                        $this.closest('.panel-body').find('.result').html(msg);
-                    }
-                });
-
-
             }
         });
 
@@ -498,33 +494,40 @@
 //            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
         });
 
-
+        // Load all the courses on refresh
+        var loadCount = 1;
+        var loadMsg = "";
         for (var key in localStorage) {
             var course = JSON.parse(localStorage[key]);
-            console.log(key);
-            var sections = course.data;
-//            console.log(sections);
-//            if (data.status != 409 && !courseExists) {
-//                var msg = '<div class="panel panel-default">' +
-//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-//                msg += data.note + "<br>";
-//                if (data.prereqs) {
-//                    msg += "<span class='title'> PRE: </span>" + data.prereqs + "<br>";
-//                }
-//                if (data.exclusions) {
-//                    msg += "<span class='title'> EXC: </span>" + data.exclusions + "<br>";
-//                }
-//                msg += "<div class='section'><span class='title'>SECTION: </span>";
-//                sections.forEach(function (section) {
-//                    msg += "<div  class='content'>" + section.sectionCode + "</div>";
-//                });
-//
-//                msg += '</div>'
-//                msg += '<div class="result"></div></div></div>';
-//                $('#courses').prepend(msg);
-//                courseCount++;
-//            }
+            course.forEach(function(data) {
+                var courseCode = key;
+                var courseName = data.title;
+                var courseData = data.data;
+                var sections = courseData.sections;
+                console.log(sections);
+
+                loadMsg = '<div class="panel panel-default">' +
+                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+                loadMsg += courseData.note + "<br>";
+
+                if (courseData.prereqs) {
+                    loadMsg += "<span class='title'> PRE: </span>" + courseData.prereqs + "<br>";
+                }
+                if (courseData.exclusions) {
+                    loadMsg += "<span class='title'> EXC: </span>" + courseData.exclusions + "<br>";
+                }
+                loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
+                sections.forEach(function (section) {
+                    loadMsg += "<div  class='content'>" + section.sectionCode + "</div>";
+                });
+
+                loadMsg += '</div>'
+                loadMsg += '<div class="result"></div></div></div>';
+                $('#courses').prepend(loadMsg);
+                courseCount++;
+
+            });
         }
 
 
@@ -535,7 +538,6 @@
                 // remove all other active buttons
                 $(".list-group-item").each(function () {$(this).removeClass('active')});
                 $this.addClass('active');
-                $('.suggested-ads').remove();
             }
         });
 
