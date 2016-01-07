@@ -190,22 +190,23 @@
             var courseCode = array1[0].trim();
             var title = array1[1].trim();
             var temp = JSON.parse(localStorage[courseCode]);
-            var doStuff = -1;
+            var courseIndex = -1;
             for (var i = 0; i < temp.length; i++) {
                 if (temp[i].title == title) {
-                    doStuff = i;
+                    courseIndex = i;
                 }
             }
-            if (doStuff != -1) {
+            if (courseIndex != -1) {
                 //If selection is empty
-                if (Object.keys(localStorage[courseCode][doStuff].selection).length == 0) {
+                if (Object.keys(localStorage[courseCode][courseIndex].selection).length == 0) {
                     var temp = {};
                     temp.section = $sectionSelected;
-                    localStorage[courseCode][doStuff].selection = temp;
-                //Selection is not empty
+                    localStorage[courseCode][courseIndex].selection = temp;
+                    //Selection is not empty
                 } else {
-                    localStorage[courseCode][doStuff].selection.section = $sectionSelected;
+                    localStorage[courseCode][courseIndex].selection.section = $sectionSelected;
                 }
+            }
 
 
             var $this = $(this);
