@@ -241,7 +241,7 @@
             // Hightlight the section
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
-                $(".section .content").each(function () {
+                $this.closest('.panel-body').find(".section .content").each(function () {
                     $(this).removeClass('selected');
                 });
                 $this.addClass('selected');
@@ -378,6 +378,9 @@
             var $this = $(this);
             // Hightlight the fixedMeeting
             if (!$this.hasClass('selected')) {
+                $this.closest('.panel-body').find(".fMeeting .content").each(function () {
+                    $(this).removeClass('selected');
+                });
                 $this.addClass('selected');
 
                 //Add fMeeting to LocalStorage
@@ -392,6 +395,8 @@
                     data.forEach(function (course) {
                         if (course.title === title) {
                             var sections = course.data.sections;
+                            var fMeetingSelection = course.selection.fMeetings;
+                            var vMeetingSelection = course.selection.vMeetings;
                             sections.forEach(function (section) {
                                 if (section.sectionCode === $sectionSelected) {
                                     var fixedMeetings = section.fixedMeetings;
@@ -491,7 +496,7 @@
             // Hightlight the varyingMeeting
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
-                $(".vMeeting .content").each(function () {
+                $this.closest('.panel-body').find(".vMeeting .content").each(function () {
                     $(this).removeClass('selected');
                 });
                 $this.addClass('selected');
