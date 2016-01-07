@@ -198,7 +198,7 @@
             }
             if (courseIndex != -1) {
                 //If selection is empty
-                if (Object.keys(localStorage[courseCode][courseIndex].selection).length == 0) {
+                if (Object.keys(JSON.parse(localStorage[courseCode])[courseIndex].selection).length == 0) {
                     var temp = {};
                     temp.section = $sectionSelected;
                     localStorage[courseCode][courseIndex].selection = temp;
