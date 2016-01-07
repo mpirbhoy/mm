@@ -315,7 +315,7 @@
             }
 
             if (courseIndex != -1) {
-                    temp[courseIndex].selection.fMeeting.push($meetingSelected);
+                    temp[courseIndex].selection.fMeetings.push($meetingSelected);
                     localStorage[courseCode] = JSON.stringify(temp);
             }
             
@@ -423,7 +423,7 @@
             }
 
             if (courseIndex != -1) {
-                temp[courseIndex].selection.vMeeting.push($meetingSelected);
+                temp[courseIndex].selection.vMeetings.push($meetingSelected);
                 localStorage[courseCode] = JSON.stringify(temp);
             }
 
