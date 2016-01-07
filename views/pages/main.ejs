@@ -196,16 +196,18 @@
                     doStuff = i;
                 }
             }
-            if (doStuff != -1) {
-                //If selection is empty
-                if (Object.keys(localStorage[courseCode][doStuff].selection).length == 0) {
-                    var temp = {};
-                    temp.section = $sectionSelected;
-                    localStorage[courseCode][doStuff].selection = temp;
-                //Selection is not empty
-                } else {
-                    localStorage[courseCode][doStuff].selection.section = $sectionSelected;
-                }
+//            if (doStuff != -1) {
+//                //If selection is empty
+//                if (Object.keys(localStorage[courseCode][doStuff].selection).length == 0) {
+//                    var temp = {};
+//                    temp.section = $sectionSelected;
+//                    localStorage[courseCode][doStuff].selection = temp;
+//                    //Selection is not empty
+//                } else {
+//                    localStorage[courseCode][doStuff].selection.section = $sectionSelected;
+//                }
+//            }
+
 
 
             var $this = $(this);
@@ -219,29 +221,34 @@
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
-                var sections = data.sections;
-                var msg = "<div class='fMeeting'><span class='title'>CHOOSE ALL: </span>";
+                data.forEach(function(course) {
+                    if (course.title === title) {
+                        var sections = course.data.sections;
+                        var msg = "<div class='fMeeting'><span class='title'>CHOOSE ALL: </span>";
+                        sections.forEach(function (section) {
+                            if (section.sectionCode === $sectionSelected) {
+                                if (section.fixedMeetings.length > 0) {
+                                    section.fixedMeetings.forEach(function(fMeeting) {
+                                        msg += "<div  class='content'>" + fMeeting.type + "</div>";
+                                    })
+                                }
+                                msg+="</div>";
 
-                sections.forEach(function (section) {
-                    if (section.sectionCode === $sectionSelected) {
-                        if (section.fixedMeetings.length > 0) {
-                            section.fixedMeetings.forEach(function(fMeeting) {
-                                msg += "<div  class='content'>" + fMeeting.type + "</div>";
-                            })
-                        }
-                        msg+="</div>";
+                                if (section.varyingMeetings.length > 0) {
+                                    msg += "<div class='vMeeting'><span class='title'>CHOOSE ONE: </span>";
+                                    section.varyingMeetings.forEach(function(vMeeting) {
+                                        msg += "<div  class='content'>" + vMeeting.type + "</div>";
+                                    });
 
-                        if (section.varyingMeetings.length > 0) {
-                            msg += "<div class='vMeeting'><span class='title'>CHOOSE ONE: </span>";
-                            section.varyingMeetings.forEach(function(vMeeting) {
-                                msg += "<div  class='content'>" + vMeeting.type + "</div>";
-                            })
-
-                        }
-                        msg+="</div>";
+                                }
+                                msg+="</div>";
+                            }
+                        });
+                        $this.closest('.panel-body').find('.result').html(msg);
                     }
                 });
-                $this.closest('.panel-body').find('.result').html(msg);
+
+
             }
         });
 
@@ -288,6 +295,8 @@
             sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+            var $text = $(this).closest('.panel').find('button').text();
+            console.log($text);
 
             var $this = $(this);
             if (!$this.hasClass('selected')) {
@@ -299,26 +308,54 @@
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
-                var sections = data.sections;
-
-                sections.forEach(function (section) {
-                    if (section.sectionCode === $sectionSelected) {
-                        var fixedMeetings =  section.fixedMeetings;
-                        fixedMeetings.forEach(function (fMeeting) {
-                            var meetingTime = fMeeting.timings;
-                            meetingTime.forEach(function (time) {
-                                sourceClicked.push({
-                                    id: $courseCode,
-                                    title: $courseCode+'\n'+ fMeeting.type,
-                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
-                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
-                                    color:'#4fd84a'
-                                });
-                            })
-                        })
+                data.forEach(function (course) {
+                    if (course.title === title) {
+                        var sections = course.data.sections;
+                        sections.forEach(function (section) {
+                            if (section.sectionCode === $sectionSelected) {
+                                var fixedMeetings = section.fixedMeetings;
+                                fixedMeetings.forEach(function (fMeeting) {
+                                    var meetingTime = fMeeting.timings;
+                                    meetingTime.forEach(function (time) {
+                                        sourceClicked.push({
+                                            id: $courseCode,
+                                            title: $courseCode + '\n' + fMeeting.type,
+                                            start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                            end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                            color: '#4fd84a'
+                                        });
+                                    })
+                                })
+                            }
+                        });
                     }
-                });
+                    $('#calendar').fullCalendar('addEventSource', sourceClicked);
+                })
             }
+
+//            if (localStorage.getItem($courseCode) === null) {
+//            } else {
+//                var data = JSON.parse(localStorage.getItem($courseCode));
+//                var sections = data.sections;
+//
+//                sections.forEach(function (section) {
+//                    if (section.sectionCode === $sectionSelected) {
+//                        var fixedMeetings =  section.fixedMeetings;
+//                        fixedMeetings.forEach(function (fMeeting) {
+//                            var meetingTime = fMeeting.timings;
+//                            meetingTime.forEach(function (time) {
+//                                sourceClicked.push({
+//                                    id: $courseCode,
+//                                    title: $courseCode+'\n'+ fMeeting.type,
+//                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
+//                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
+//                                    color:'#4fd84a'
+//                                });
+//                            })
+//                        })
+//                    }
+//                });
+//            }
             $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
         });
 
