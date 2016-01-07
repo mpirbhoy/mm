@@ -218,6 +218,7 @@
         $('body').on('click', '.section .content', function() {
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).text();
+//            alert("selectionSelected = " + $sectionSelected);
             var raw1 = $(this).closest('.panel').find('button').text();
             var text1 = raw1.substring(1);
             var array1 = text1.split(':');
@@ -593,11 +594,18 @@
                     loadMsg += '</div>'
                     loadMsg += '<div class="result"></div></div></div>';
                     $('#courses').prepend(loadMsg);
-                    courseCount++;
 
+                    // Generate click events for sections, fmeeting and vmeeting
+                    $('#collapse' +  courseCount + ' .section .content').each(function ()  {
+                        if ($(this).text() == 'A') {
+                            $(this).trigger("click");
+                        }
+                    })
+                    courseCount++;
                 });
             }
         }
+//        $(".content:contains('A')").trigger('click');
 
         $('body').on('click', '.list-group-item', function(e) {
             e.preventDefault();
