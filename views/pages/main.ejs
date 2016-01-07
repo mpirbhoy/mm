@@ -45,11 +45,8 @@
     $(document).ready(function() {
         // Initiate localStorage
         if (typeof(Storage) !== "undefined") {
-            // Store
-            localStorage.setItem("test", "test");
             // Retrieve
             console.log("Successful");
-            localStorage.clear();
         } else {
             alert("Your browser does not support Web Storage.\n (data is lost when the browser is closed.)");
         }
@@ -325,8 +322,8 @@
             }
 
             if (courseIndex != -1) {
-                    temp[courseIndex].selection.fMeetings.push($meetingSelected);
-                    localStorage[courseCode] = JSON.stringify(temp);
+                temp[courseIndex].selection.fMeetings.push($meetingSelected);
+                localStorage[courseCode] = JSON.stringify(temp);
             }
 
             var $this = $(this);
@@ -417,7 +414,7 @@
             $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
             sourceClicked = [];
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
-            var $sectionSelected = $(this).parent().prev().find('.selected').text();
+            var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
             var raw1 = $(this).closest('.panel').find('button').text();
             var $meetingSelected = $(this).text();
             var text1 = raw1.substring(1);
@@ -501,11 +498,35 @@
         });
 
 
+        for (var key in localStorage) {
+            var course = JSON.parse(localStorage[key]);
+            console.log(key);
+            var sections = course.data;
+//            console.log(sections);
+//            if (data.status != 409 && !courseExists) {
+//                var msg = '<div class="panel panel-default">' +
+//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+//                msg += data.note + "<br>";
+//                if (data.prereqs) {
+//                    msg += "<span class='title'> PRE: </span>" + data.prereqs + "<br>";
+//                }
+//                if (data.exclusions) {
+//                    msg += "<span class='title'> EXC: </span>" + data.exclusions + "<br>";
+//                }
+//                msg += "<div class='section'><span class='title'>SECTION: </span>";
+//                sections.forEach(function (section) {
+//                    msg += "<div  class='content'>" + section.sectionCode + "</div>";
+//                });
+//
+//                msg += '</div>'
+//                msg += '<div class="result"></div></div></div>';
+//                $('#courses').prepend(msg);
+//                courseCount++;
+//            }
+        }
 
-        // Load courses on reload
-        //for (var i = 0; i < courses.length; i++) {
-        //    $('#courses').prepend("<button type='submit' class='list-group-item' value=" + courses[i].courseCode + "><span id='close'>x</span>  " + courses[i].courseCode + ": " + courses[i].courseName + "</button>");
-        //};
+
         $('body').on('click', '.list-group-item', function(e) {
             e.preventDefault();
             var $this = $(this);
