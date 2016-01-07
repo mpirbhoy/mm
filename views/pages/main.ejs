@@ -197,6 +197,10 @@
                 }
             }
 
+            if (temp[courseIndex].selection == $sectionSelected) {
+                courseIndex = -1;
+            }
+
             if (courseIndex != -1) {
                 //If selection is empty
                 if (Object.keys(JSON.parse(localStorage[courseCode])[courseIndex].selection).length == 0) {
