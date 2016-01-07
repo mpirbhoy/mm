@@ -182,6 +182,7 @@
         }
 
         $('body').on('click', '.section .content', function() {
+            var $allSectionsSelected;
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).text();
             var raw1 = $(this).closest('.panel').find('button').text();
@@ -223,8 +224,13 @@
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
                 $(".section .content").each(function () {$(this).removeClass('selected')});
+
                 $this.addClass('selected');
 
+            } else {
+                $(this).removeClass('selected');
+                $(this).parent().next().empty();
+                return;
             }
 
             if (localStorage.getItem($courseCode) === null) {
@@ -322,7 +328,7 @@
                     temp[courseIndex].selection.fMeetings.push($meetingSelected);
                     localStorage[courseCode] = JSON.stringify(temp);
             }
-            
+
             var $this = $(this);
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
