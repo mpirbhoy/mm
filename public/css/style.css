@@ -54,7 +54,7 @@ MAIN - SEARCH SIDE BAR
 
 }
 
-.section .title, .fMeeting .title, .vMeeting .title {
+.title {
     font-weight: bold;
     margin: 5px 0 0 0;
 }
@@ -68,6 +68,8 @@ MAIN - SEARCH SIDE BAR
     background-color: #fff;
     border: 0px solid transparent;
 }
+
+.panel-body
 
 .red {
     color: #00cccc;
@@ -91,8 +93,8 @@ MAIN - SEARCH SIDE BAR
     display: -moz-inline-stack;
     display: inline-block;
     margin: 2px;
-    padding-right: 1px;
-    padding-left: 1px;
+    padding-right: 2px;
+    padding-left: 2px;
     border: 1px solid green;
     color: green;
     cursor: pointer;

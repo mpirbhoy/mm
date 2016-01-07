@@ -296,11 +296,13 @@
             var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
             var $text = $(this).closest('.panel').find('button').text();
             console.log($text);
+            console.log($(this).text());
+
 
             var $this = $(this);
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
-                $(".fMeeting .content").each(function () {$(this).removeClass('selected')});
+                // $(".fMeeting .content").each(function () {$(this).removeClass('selected')});
                 $this.addClass('selected');
             }
 
@@ -380,7 +382,7 @@
             return date;
         }
 
-        // Add fixed meeting section on calendar
+        // Add variable meeting section on calendar
         $('body').on('click', '.vMeeting .content', function(e) {
             $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
             sourceClicked = [];
@@ -397,27 +399,55 @@
             if (localStorage.getItem($courseCode) === null) {
             } else {
                 var data = JSON.parse(localStorage.getItem($courseCode));
-                var sections = data.sections;
-
-                sections.forEach(function (section) {
-                    if (section.sectionCode === $sectionSelected) {
-                        var catalogs =  section.catalogs;
-                        catalogs.forEach(function (catalog) {
-                            var meetingTime = catalog.meeting.timings;
-                            meetingTime.forEach(function (time) {
-                                sourceClicked.push({
-                                    id: $courseCode,
-                                    title: $courseCode+'\n'+catalog.meeting.type,
-                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
-                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
-                                    color:'#4fd84a'
-                                });
-                            })
-                        })
+                data.forEach(function (course) {
+                    if (course.title === title) {
+                        var sections = course.data.sections;
+                        sections.forEach(function (section) {
+                            if (section.sectionCode === $sectionSelected) {
+                                var varyingMeetings = section.varyingMeetings;
+                                varyingMeetings.forEach(function (vMeeting) {
+                                    var meetingTime = vMeeting.timings;
+                                    meetingTime.forEach(function (time) {
+                                        sourceClicked.push({
+                                            id: $courseCode,
+                                            title: $courseCode + '\n' + vMeeting.type,
+                                            start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                            end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                            color: '#4fd84a'
+                                        });
+                                    })
+                                })
+                            }
+                        });
                     }
-                });
+                    $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
+                })
             }
-            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
+
+//            if (localStorage.getItem($courseCode) === null) {
+//            } else {
+//                var data = JSON.parse(localStorage.getItem($courseCode));
+//                var sections = data.sections;
+//
+//                sections.forEach(function (section) {
+//                    if (section.sectionCode === $sectionSelected) {
+//                        var catalogs =  section.catalogs;
+//                        catalogs.forEach(function (catalog) {
+//                            var meetingTime = catalog.meeting.timings;
+//                            meetingTime.forEach(function (time) {
+//                                sourceClicked.push({
+//                                    id: $courseCode,
+//                                    title: $courseCode+'\n'+catalog.meeting.type,
+//                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0+time.startTime),
+//                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0+time.endTime),
+//                                    color:'#4fd84a'
+//                                });
+//                            })
+//                        })
+//                    }
+//                });
+//            }
+//            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
         });
 
 
