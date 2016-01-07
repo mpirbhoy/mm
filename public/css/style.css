@@ -56,10 +56,9 @@ MAIN - SEARCH SIDE BAR
 
 .title {
     font-weight: bold;
-    margin: 5px 0 0 0;
 }
 
-.section, .fMeeting {
+.section, .fMeeting, .vMeeting{
     margin-bottom: 5px;
 }
 

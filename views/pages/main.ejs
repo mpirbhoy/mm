@@ -246,6 +246,7 @@
                                     msg+="</div>";
                                 }
                             });
+                            msg+= "<div class='catalog'><span class='title'>CATALOG#: </span><div  class='number'></div></div>";
                             $this.closest('.panel-body').find('.result').html(msg);
                         }
                     });
@@ -489,7 +490,7 @@
 //            $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
         });
 
-
+        // Load all the courses on refresh
         var loadCount = 1;
         var loadMsg = "";
         for (var key in localStorage) {
@@ -523,28 +524,6 @@
                 courseCount++;
 
             });
-//            console.log(sections);
-//            if (data.status != 409 && !courseExists) {
-//                var msg = '<div class="panel panel-default">' +
-//                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-//                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-//                msg += data.note + "<br>";
-//                if (data.prereqs) {
-//                    msg += "<span class='title'> PRE: </span>" + data.prereqs + "<br>";
-//                }
-//                if (data.exclusions) {
-//                    msg += "<span class='title'> EXC: </span>" + data.exclusions + "<br>";
-//                }
-//                msg += "<div class='section'><span class='title'>SECTION: </span>";
-//                sections.forEach(function (section) {
-//                    msg += "<div  class='content'>" + section.sectionCode + "</div>";
-//                });
-//
-//                msg += '</div>'
-//                msg += '<div class="result"></div></div></div>';
-//                $('#courses').prepend(msg);
-//                courseCount++;
-//            }
         }
 
 
@@ -555,7 +534,6 @@
                 // remove all other active buttons
                 $(".list-group-item").each(function () {$(this).removeClass('active')});
                 $this.addClass('active');
-                $('.suggested-ads').remove();
             }
         });
 
