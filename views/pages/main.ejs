@@ -222,7 +222,7 @@
             var text1 = raw1.substring(1);
             var array1 = text1.split(':');
             var courseCode = array1[0].trim();
-            var title = array1[1].trim();
+            var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var courseIndex = -1;
             for (var i = 0; i < temp.length; i++) {
@@ -359,7 +359,7 @@
             var text1 = raw1.substring(1);
             var array1 = text1.split(':');
             var courseCode = array1[0].trim();
-            var title = array1[1].trim();
+            var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var courseIndex = -1;
             for (var i = 0; i < temp.length; i++) {
@@ -464,7 +464,7 @@
             var text1 = raw1.substring(1);
             var array1 = text1.split(':');
             var courseCode = array1[0].trim();
-            var title = array1[1].trim();
+            var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var courseIndex = -1;
             for (var i = 0; i < temp.length; i++) {
@@ -596,7 +596,7 @@
             var text1 = raw1.substring(1);
             var array1 = text1.split(':');
             var courseCode = array1[0].trim();
-            var title = array1[1].trim();
+            var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var toDel = -1;
             for (var i = 0; i < temp.length; i++) {
@@ -607,6 +607,7 @@
             if (toDel != -1) {
                 temp.splice(toDel, 1);
             }
+
             localStorage[courseCode] = JSON.stringify(temp);
 
             //Remove empty array
@@ -614,15 +615,16 @@
                 localStorage.removeItem(courseCode);
                 var allCourses = JSON.parse(localStorage['allCourses']);
                 var courseIndex = -1;
-                for (var e = 0; e < allCourses.length; e++) {
-                    if (allCourses[e] == courseCode) {
-                        courseIndex = e;
+                for (var i = 0; i < allCourses.length; i++) {
+                    if (allCourses[i] == courseCode) {
+                        courseIndex = i;
                     }
                 }
-                console.log(e);
-                allCourses.splice(e, 1);
+                allCourses.splice(courseIndex, 1);
                 localStorage['allCourses'] = JSON.stringify(allCourses);
-
+                if (localStorage['allCourses'] == '[]') {
+                    localStorage.removeItem('allCourses');
+                }
 
             }
             $(this).closest('.panel').remove();
