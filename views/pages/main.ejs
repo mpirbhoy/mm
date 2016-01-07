@@ -110,7 +110,7 @@
                     return value;
                 });
             }
-            var courseExists = false;
+            var titleExists = false;
             var courseCode = JSON.parse(args).data['courseCode'];
             var courseName = JSON.parse(args).data['courseName'];
 
@@ -121,23 +121,62 @@
                 success: function(data) {
                     if (localStorage[courseCode] == null) {
                         localStorage[courseCode] = JSON.stringify([{title: courseName, data: data, selection: {}}]);
+                        if (localStorage['allCourses'] == null) {
+                            var temp = [courseCode];
+                            localStorage['allCourses'] = JSON.stringify(temp);
+                        } else {
+                            var temp = JSON.parse(localStorage['allCourses']);
+                            var courseExists = false;
+                            for (var i = 0; i < temp.length; i++) {
+                                if (temp[i] == courseCode) {
+                                    courseExists = true;
+                                }
+                            }
+                            if (!courseExists) {
+                                temp.push(courseCode);
+                                localStorage['allCourses'] = JSON.stringify(temp);
+                            }
+                        }
                     } else {
                         var temp = JSON.parse(localStorage[courseCode]);
                         for (var i = 0; i < temp.length; i++) {
                             if (temp[i].title == data.title) {
-                                courseExists = true;
+                                titleExists = true;
                             }
                         }
-                        if (!courseExists) {
+                        if (!titleExists) {
                             temp.push({title: courseName, data: data, selection: {}});
                             localStorage[courseCode] = JSON.stringify(temp);
+                            if (localStorage[courseCode] == null) {
+                                localStorage[courseCode] = JSON.stringify([{
+                                    title: courseName,
+                                    data: data,
+                                    selection: {}
+                                }]);
+                                if (localStorage['allCourses'] == null) {
+                                    var temp = [courseCode];
+                                    localStorage['allCourses'] = JSON.stringify(temp);
+                                } else {
+                                    var temp = JSON.parse(localStorage['allCourses']);
+                                    var courseExists = false;
+                                    for (var i = 0; i < temp.length; i++) {
+                                        if (temp[i] == courseCode) {
+                                            courseExists = true;
+                                        }
+                                    }
+                                    if (!courseExists) {
+                                        temp.push(courseCode);
+                                        localStorage['allCourses'] = JSON.stringify(temp);
+                                    }
+                                }
+                            }
                         }
 
 
                     }
 
                     var sections = data.sections;
-                    if (data.status != 409 && !courseExists) {
+                    if (data.status != 409 && !titleExists) {
                         var msg = '<div class="panel panel-default">'+
                                 '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
                                 '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
@@ -260,6 +299,12 @@
             } else {
                 $(this).removeClass('selected');
                 $(this).parent().next().empty();
+
+                //Removes section from localStorage
+                if (courseIndex != -1) {
+                    temp[courseIndex].selection = {};
+                    localStorage[courseCode] = JSON.stringify(temp);
+                }
             }
         });
 
@@ -306,6 +351,21 @@
             sourceClicked = [];
 
             var $this = $(this);
+            var $courseCode = $(this).closest('.panel').find('button').attr('value');
+            var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+            var raw1 = $(this).closest('.panel').find('button').text();
+            var $meetingSelected = $(this).text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var courseIndex = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    courseIndex = i;
+                }
+            }
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
                 $(".fMeeting .content").each(function () {
@@ -313,22 +373,7 @@
                 });
                 $this.addClass('selected');
 
-                var $courseCode = $(this).closest('.panel').find('button').attr('value');
-                var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
-                var raw1 = $(this).closest('.panel').find('button').text();
-                var $meetingSelected = $(this).text();
-                var text1 = raw1.substring(1);
-                var array1 = text1.split(':');
-                var courseCode = array1[0].trim();
-                var title = array1[1].trim();
-                var temp = JSON.parse(localStorage[courseCode]);
-                var courseIndex = -1;
-                for (var i = 0; i < temp.length; i++) {
-                    if (temp[i].title == title) {
-                        courseIndex = i;
-                    }
-                }
-
+                //Add fMeeting to LocalStorage
                 if (courseIndex != -1) {
                     temp[courseIndex].selection.fMeetings.push($meetingSelected);
                     localStorage[courseCode] = JSON.stringify(temp);
@@ -364,6 +409,21 @@
             } else {
                 $(this).removeClass('selected');
                 $('#calendar').fullCalendar('removeEventSource', sourceClicked);
+                //Remove fMeeting from LocalStorage
+                if (courseIndex != -1) {
+                    //Find index of fMeeting to be removed
+                    var fMeetingIndex = -1;
+                    for (var e= 0; e < temp[courseIndex].selection.fMeetings; e++) {
+                        if (temp[courseIndex].selection.fMeetings[fMeetingIndex] == $meetingSelected) {
+                            fMeetingIndex = e;
+                        }
+                    }
+                    if (fMeetingIndex != -1) {
+                        temp[courseIndex].selection.fMeetings.splice(fMeetingIndex, 1);
+                        localStorage[courseCode] = JSON.stringify(temp);
+                    }
+
+                }
             }
         });
 
@@ -394,6 +454,22 @@
             $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
             sourceClicked = [];
 
+            var $courseCode = $(this).closest('.panel').find('button').attr('value');
+            var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+            var raw1 = $(this).closest('.panel').find('button').text();
+            var $meetingSelected = $(this).text();
+            var text1 = raw1.substring(1);
+            var array1 = text1.split(':');
+            var courseCode = array1[0].trim();
+            var title = array1[1].trim();
+            var temp = JSON.parse(localStorage[courseCode]);
+            var courseIndex = -1;
+            for (var i = 0; i < temp.length; i++) {
+                if (temp[i].title == title) {
+                    courseIndex = i;
+                }
+            }
+
             var $this = $(this);
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
@@ -402,21 +478,6 @@
                 });
                 $this.addClass('selected');
 
-                var $courseCode = $(this).closest('.panel').find('button').attr('value');
-                var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
-                var raw1 = $(this).closest('.panel').find('button').text();
-                var $meetingSelected = $(this).text();
-                var text1 = raw1.substring(1);
-                var array1 = text1.split(':');
-                var courseCode = array1[0].trim();
-                var title = array1[1].trim();
-                var temp = JSON.parse(localStorage[courseCode]);
-                var courseIndex = -1;
-                for (var i = 0; i < temp.length; i++) {
-                    if (temp[i].title == title) {
-                        courseIndex = i;
-                    }
-                }
 
                 if (courseIndex != -1) {
                     temp[courseIndex].selection.vMeetings.push($meetingSelected);
@@ -453,45 +514,63 @@
             } else {
                 $(this).removeClass('selected');
                 $('#calendar').fullCalendar('removeEventSource', sourceClicked);
+
+                //Remove vMeeting from LocalStorage
+                if (courseIndex != -1) {
+                    //Find index of vMeeting to be removed
+                    var vMeetingIndex = -1;
+                    for (var e= 0; e < temp[courseIndex].selection.vMeetings; e++) {
+                        if (temp[courseIndex].selection.vMeetings[vMeetingIndex] == $meetingSelected) {
+                            vMeetingIndex = e;
+                        }
+                    }
+                    if (vMeetingIndex != -1) {
+                        temp[courseIndex].selection.vMeetings.splice(vMeetingIndex, 1);
+                        localStorage[courseCode] = JSON.stringify(temp);
+                    }
+
+                }
             }
         });
 
         // Load all the courses on refresh
+        localStorage['appVersion'] = "1.0";
         var loadCount = 1;
         var loadMsg = "";
-        for (var key in localStorage) {
-            var course = JSON.parse(localStorage[key]);
-            course.forEach(function(data) {
-                var courseCode = key;
-                var courseName = data.title;
-                var courseData = data.data;
-                var sections = courseData.sections;
-                console.log(sections);
+        if (localStorage['allCourses'] != null) {
+            for (var i in JSON.parse(localStorage['allCourses'])) {
+                var course = JSON.parse(localStorage[JSON.parse(localStorage['allCourses'])[i]]);
+                course.forEach(function (data) {
+                    var courseCode = JSON.parse(localStorage['allCourses'])[i];
+                    var courseName = data.title;
+                    var courseData = data.data;
+                    var sections = courseData.sections;
+                    console.log(sections);
 
-                loadMsg = '<div class="panel panel-default">' +
-                        '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                        '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-                loadMsg += courseData.note + "<br>";
+                    loadMsg = '<div class="panel panel-default">' +
+                            '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+                    loadMsg += courseData.note + "<br>";
 
-                if (courseData.prereqs) {
-                    loadMsg += "<span class='title'> PRE: </span>" + courseData.prereqs + "<br>";
-                }
-                if (courseData.exclusions) {
-                    loadMsg += "<span class='title'> EXC: </span>" + courseData.exclusions + "<br>";
-                }
-                loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
-                sections.forEach(function (section) {
-                    loadMsg += "<div  class='content'>" + section.sectionCode + "</div>";
+                    if (courseData.prereqs) {
+                        loadMsg += "<span class='title'> PRE: </span>" + courseData.prereqs + "<br>";
+                    }
+                    if (courseData.exclusions) {
+                        loadMsg += "<span class='title'> EXC: </span>" + courseData.exclusions + "<br>";
+                    }
+                    loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
+                    sections.forEach(function (section) {
+                        loadMsg += "<div  class='content'>" + section.sectionCode + "</div>";
+                    });
+
+                    loadMsg += '</div>'
+                    loadMsg += '<div class="result"></div></div></div>';
+                    $('#courses').prepend(loadMsg);
+                    courseCount++;
+
                 });
-
-                loadMsg += '</div>'
-                loadMsg += '<div class="result"></div></div></div>';
-                $('#courses').prepend(loadMsg);
-                courseCount++;
-
-            });
+            }
         }
-
 
         $('body').on('click', '.list-group-item', function(e) {
             e.preventDefault();
@@ -521,8 +600,22 @@
                 temp.splice(toDel, 1);
             }
             localStorage[courseCode] = JSON.stringify(temp);
+
+            //Remove empty array
             if (JSON.parse(localStorage[courseCode]).length == 0) {
                 localStorage.removeItem(courseCode);
+                var allCourses = JSON.parse(localStorage['allCourses']);
+                var courseIndex = -1;
+                for (var e = 0; e < allCourses.length; e++) {
+                    if (allCourses[e] == courseCode) {
+                        courseIndex = e;
+                    }
+                }
+                console.log(e);
+                allCourses.splice(e, 1);
+                localStorage['allCourses'] = JSON.stringify(allCourses);
+
+
             }
             $(this).closest('.panel').remove();
 //            $form = $(this).closest('form');
