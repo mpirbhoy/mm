@@ -363,18 +363,23 @@
             var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var courseIndex = -1;
+            var reloading = false;
             for (var i = 0; i < temp.length; i++) {
                 if (temp[i].title == title) {
                     courseIndex = i;
                 }
             }
 
-            //Check if meeting Selected is already in the array
-//            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {//TODO temporarily comment out
-//                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
-//                    courseIndex = -1;
-//                }
-//            }
+//            Check if meeting Selected is already in the array
+
+            console.log(temp);
+            console.log(courseIndex);
+            console.log(temp[courseIndex].selection.fMeetings.length);
+            for (var ii = 0; ii < temp[courseIndex].selection.fMeetings.length; ii++ ) {
+                if (temp[courseIndex].selection.fMeetings[ii] == $meetingSelected) {
+                    reloading = true;
+                }
+            }
 
             var $this = $(this);
             // Hightlight the fixedMeeting
@@ -385,7 +390,7 @@
                 $this.addClass('selected');
 
                 //Add fMeeting to LocalStorage
-                if (courseIndex != -1) {
+                if (courseIndex != -1 && !reloading) {
                     temp[courseIndex].selection.fMeetings.push($meetingSelected);
                     localStorage[courseCode] = JSON.stringify(temp);
                 }
