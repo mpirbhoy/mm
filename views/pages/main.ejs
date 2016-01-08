@@ -232,9 +232,6 @@
                 }
             }
 
-            if (temp[courseIndex].selection.section == $sectionSelected) {
-                courseIndex = -1;
-            }
 
 
 
@@ -246,6 +243,9 @@
                     $(this).removeClass('selected');
                 });
                 $this.addClass('selected');
+                if (temp[courseIndex].selection.section == $sectionSelected) { //TODO Casued a problem : didn't remove localstorage selection
+                    courseIndex = -1;
+                }
                 if (localStorage.getItem($courseCode) === null) {
                 } else {
                     var data = JSON.parse(localStorage.getItem($courseCode));
@@ -370,11 +370,11 @@
             }
 
             //Check if meeting Selected is already in the array
-            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {
-                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
-                    courseIndex = -1;
-                }
-            }
+//            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {//TODO temporarily comment out
+//                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
+//                    courseIndex = -1;
+//                }
+//            }
 
             var $this = $(this);
             // Hightlight the fixedMeeting
@@ -429,8 +429,8 @@
                 if (courseIndex != -1) {
                     //Find index of fMeeting to be removed
                     var fMeetingIndex = -1;
-                    for (var e= 0; e < temp[courseIndex].selection.fMeetings; e++) {
-                        if (temp[courseIndex].selection.fMeetings[fMeetingIndex] == $meetingSelected) {
+                    for (var e= 0; e < temp[courseIndex].selection.fMeetings.length; e++) {
+                        if (temp[courseIndex].selection.fMeetings[e] == $meetingSelected) {
                             fMeetingIndex = e;
                         }
                     }
@@ -487,11 +487,11 @@
             }
 
             //Check if meeting Selected is already in the array
-            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) {
-                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
-                    courseIndex = -1;
-                }
-            }
+//            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) { //TODO temporarily comment out
+//                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
+//                    courseIndex = -1;
+//                }
+//            }
 
             var $this = $(this);
             // Hightlight the varyingMeeting
@@ -546,8 +546,8 @@
                 if (courseIndex != -1) {
                     //Find index of vMeeting to be removed
                     var vMeetingIndex = -1;
-                    for (var e= 0; e < temp[courseIndex].selection.vMeetings; e++) {
-                        if (temp[courseIndex].selection.vMeetings[vMeetingIndex] == $meetingSelected) {
+                    for (var e= 0; e < temp[courseIndex].selection.vMeetings.length; e++) {
+                        if (temp[courseIndex].selection.vMeetings[e] == $meetingSelected) {
                             vMeetingIndex = e;
                         }
                     }
@@ -596,11 +596,35 @@
                     $('#courses').prepend(loadMsg);
 
                     // Generate click events for sections, fmeeting and vmeeting
+
+                    // section
+                    var selectedSection = data.selection.section;
                     $('#collapse' +  courseCount + ' .section .content').each(function ()  {
-                        if ($(this).text() == 'A') {
+                        if ($(this).text() == selectedSection) {
                             $(this).trigger("click");
                         }
                     })
+
+                    // fmeeting
+                    var myFMeetings = data.selection.fMeetings;
+
+                    $('#collapse' + courseCount + ' .result .fMeeting .content').each(function() {
+                        for (var k = 0; k < myFMeetings.length; k++) {
+                            if ($(this).text() == myFMeetings[k]){
+                                $(this).trigger("click");
+                            }
+                        }
+                    })
+
+                    var myVMeetings = data.selection.vMeetings;
+                    $('#collapse' + courseCount + ' .result .vMeeting .content').each(function() {
+                        for (var h = 0; h < myVMeetings.length; h++) {
+                            if ($(this).text() == myVMeetings[h]){
+                                $(this).trigger("click");
+                            }
+                        }
+                    })
+
                     courseCount++;
                 });
             }
