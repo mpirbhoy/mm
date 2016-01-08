@@ -429,8 +429,8 @@
                 if (courseIndex != -1) {
                     //Find index of fMeeting to be removed
                     var fMeetingIndex = -1;
-                    for (var e= 0; e < temp[courseIndex].selection.fMeetings; e++) {
-                        if (temp[courseIndex].selection.fMeetings[fMeetingIndex] == $meetingSelected) {
+                    for (var e= 0; e < temp[courseIndex].selection.fMeetings ; e++) {
+                        if (temp[courseIndex].selection.fMeetings[e] == $meetingSelected) {
                             fMeetingIndex = e;
                         }
                     }
