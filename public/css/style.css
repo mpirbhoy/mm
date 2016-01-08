@@ -68,6 +68,10 @@ MAIN - SEARCH SIDE BAR
     border: 0px solid transparent;
 }
 
+.panel-body {
+    padding: 0 15px 15px 15px;
+}
+
 .red {
     color: #00cccc;
     /*font-weight: bold;*/
