@@ -42,6 +42,8 @@
 
 
 <script>
+    var sourceClicked;
+    var sourceTemp;
     $(document).ready(function() {
         // Initiate localStorage
         if (typeof(Storage) !== "undefined") {
@@ -236,8 +238,6 @@
                 courseIndex = -1;
             }
 
-
-
             var $this = $(this);
             // Hightlight the section
             if (!$this.hasClass('selected')) {
@@ -312,7 +312,8 @@
         });
 
         var source = [];
-        var sourceClicked = [];
+        sourceClicked = [];
+        sourceTemp = [];
 
 //        $('body').on({
 //            mouseenter: function(){
@@ -350,7 +351,8 @@
 
         // Add fixed meeting section on calendar
         $('body').on('click', '.fMeeting .content', function(e) {
-//            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
+
 //            sourceClicked = [];
 
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
@@ -370,18 +372,18 @@
             }
 
             //Check if meeting Selected is already in the array
-            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {
-                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
-                    courseIndex = -1;
-                }
-            }
+//            for (var i = 0; i < temp[courseIndex].selection.fMeetings.length; i++ ) {
+//                if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
+//                    courseIndex = -1;
+//                }
+//            }
 
             var $this = $(this);
             // Hightlight the fixedMeeting
             if (!$this.hasClass('selected')) {
-                $this.closest('.panel-body').find(".fMeeting .content").each(function () {
-                    $(this).removeClass('selected');
-                });
+//                $this.closest('.panel-body').find(".fMeeting .content").each(function () {
+//                    $(this).removeClass('selected');
+//                });
                 $this.addClass('selected');
 
                 //Add fMeeting to LocalStorage
@@ -396,12 +398,12 @@
                     data.forEach(function (course) {
                         if (course.title === title) {
                             var sections = course.data.sections;
-                            var fMeetingSelection = course.selection.fMeetings;
-                            var vMeetingSelection = course.selection.vMeetings;
+//                            var fMeetingSelection = course.selection.fMeetings;
+//                            var vMeetingSelection = course.selection.vMeetings;
                             sections.forEach(function (section) {
                                 if (section.sectionCode === $sectionSelected) {
                                     var fixedMeetings = section.fixedMeetings;
-                                    fixedMeetings.forEach(function (fMeeting) {
+                                            fixedMeetings.forEach(function (fMeeting) {
                                         if (fMeeting.type === $meetingSelected) {
                                             var meetingTime = fMeeting.timings;
                                             meetingTime.forEach(function (time) {
@@ -410,7 +412,8 @@
                                                     title: $courseCode + '\n' + fMeeting.type,
                                                     start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
                                                     end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
-                                                    color: '#4fd84a'
+                                                    color: '#4fd84a',
+                                                    courseName: title
                                                 });
                                             })
                                         };
@@ -419,12 +422,65 @@
                             });
                         }
                     })
+                    console.log("A3");
+//                    console.log(sourceClicked);
                     $('#calendar').fullCalendar('addEventSource', sourceClicked);
                 }
             } else {
                 // Dehighlight the fixedMeeting
                 $(this).removeClass('selected');
-                $('#calendar').fullCalendar('removeEventSource', sourceClicked);
+
+                var $courseCode = $(this).closest('.panel').find('button').attr('value');
+                var title = text1.substring(courseCode.length +1).trim();
+                var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+                var $meetingSelected = $(this).text();
+
+                if (localStorage.getItem($courseCode) === null) {
+                } else {
+                    $('#calendar').fullCalendar('removeEventSource', sourceClicked);
+                    var data = JSON.parse(localStorage.getItem($courseCode));
+                    data.forEach(function (course) {
+                        if (course.title === title) {
+                            var sections = course.data.sections;
+//                            var fMeetingSelection = course.selection.fMeetings;
+//                            var vMeetingSelection = course.selection.vMeetings;
+                            sections.forEach(function (section) {
+                                if (section.sectionCode === $sectionSelected) {
+                                    var fixedMeetings = section.fixedMeetings;
+                                    fixedMeetings.forEach(function (fMeeting) {
+                                        if (fMeeting.type === $meetingSelected) {
+                                            var meetingTime = fMeeting.timings;
+                                            meetingTime.forEach(function (time) {
+                                                sourceClicked.forEach(function(calendarObj) {
+                                                    if (calendarObj.id !== $courseCode ||
+                                                    calendarObj.courseName !== title ||
+                                                    calendarObj.title !== $courseCode + '\n' + fMeeting.type) {
+                                                        sourceTemp.push({
+                                                            id: calendarObj.id,
+                                                            title: calendarObj.title,
+                                                            start: calendarObj.start,
+                                                            end: calendarObj.end,
+                                                            color: calendarObj.color,
+                                                            courseName: calendarObj.courseName
+                                                        });
+                                                        console.log(sourceTemp.length);
+                                                    }
+                                                })
+                                            })
+                                        };
+                                    })
+                                }
+                            });
+                        }
+                    })
+                    sourceClicked = [];
+                    sourceClicked = sourceClicked.concat(sourceTemp);
+                    sourceTemp = [];
+
+                    console.log("A1");
+                    $('#calendar').fullCalendar('addEventSource', sourceClicked);
+                }
+
                 //Remove fMeeting from LocalStorage
                 if (courseIndex != -1) {
                     //Find index of fMeeting to be removed
@@ -487,11 +543,11 @@
             }
 
             //Check if meeting Selected is already in the array
-            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) {
-                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
-                    courseIndex = -1;
-                }
-            }
+//            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) {
+//                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
+//                    courseIndex = -1;
+//                }
+//            }
 
             var $this = $(this);
             // Hightlight the varyingMeeting
@@ -535,6 +591,7 @@
                             });
                         }
                     })
+                    console.log("a2");
                     $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
                 }
             } else {
@@ -573,11 +630,10 @@
                     var courseName = data.title;
                     var courseData = data.data;
                     var sections = courseData.sections;
-                    console.log(sections);
 
                     loadMsg = '<div class="panel panel-default">' +
                             '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse"><div class="panel-body">';
                     loadMsg += courseData.note + "<br>";
 
                     if (courseData.prereqs) {
