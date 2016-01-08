@@ -42,8 +42,6 @@
 
 
 <script>
-    var sourceClicked;
-    var sourceTemp;
     $(document).ready(function() {
         // Initiate localStorage
         if (typeof(Storage) !== "undefined") {
@@ -312,8 +310,8 @@
         });
 
         var source = [];
-        sourceClicked = [];
-        sourceTemp = [];
+        var sourceClicked = [];
+        var sourceRemove = [];
 
 //        $('body').on({
 //            mouseenter: function(){
@@ -422,7 +420,6 @@
                             });
                         }
                     })
-                    console.log("A3");
 //                    console.log(sourceClicked);
                     $('#calendar').fullCalendar('addEventSource', sourceClicked);
                 }
@@ -431,13 +428,13 @@
                 $(this).removeClass('selected');
 
                 var $courseCode = $(this).closest('.panel').find('button').attr('value');
+                var text1 = raw1.substring(1);
                 var title = text1.substring(courseCode.length +1).trim();
                 var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
                 var $meetingSelected = $(this).text();
 
                 if (localStorage.getItem($courseCode) === null) {
                 } else {
-                    $('#calendar').fullCalendar('removeEventSource', sourceClicked);
                     var data = JSON.parse(localStorage.getItem($courseCode));
                     data.forEach(function (course) {
                         if (course.title === title) {
@@ -451,34 +448,36 @@
                                         if (fMeeting.type === $meetingSelected) {
                                             var meetingTime = fMeeting.timings;
                                             meetingTime.forEach(function (time) {
-                                                sourceClicked.forEach(function(calendarObj) {
-                                                    if (calendarObj.id !== $courseCode ||
-                                                    calendarObj.courseName !== title ||
-                                                    calendarObj.title !== $courseCode + '\n' + fMeeting.type) {
-                                                        sourceTemp.push({
-                                                            id: calendarObj.id,
-                                                            title: calendarObj.title,
-                                                            start: calendarObj.start,
-                                                            end: calendarObj.end,
-                                                            color: calendarObj.color,
-                                                            courseName: calendarObj.courseName
-                                                        });
-                                                        console.log(sourceTemp.length);
-                                                    }
-                                                })
+                                                sourceRemove.push({
+                                                    id: $courseCode,
+                                                    title: $courseCode + '\n' + fMeeting.type,
+                                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                                    color: '#4fd84a',
+                                                    courseName: title
+                                                });
                                             })
+                                            console.log(sourceRemove.length);
                                         };
                                     })
                                 }
                             });
                         }
                     })
-                    sourceClicked = [];
-                    sourceClicked = sourceClicked.concat(sourceTemp);
-                    sourceTemp = [];
-
-                    console.log("A1");
+                    sourceClicked.forEach(function(calendarObj, i) {
+                        sourceRemove.forEach(function (removeObj){
+                            if (calendarObj.id === removeObj.id &&
+                                    calendarObj.courseName === removeObj.courseName ||
+                                    calendarObj.title === removeObj.title) {
+                                sourceClicked.splice(i, 1);
+                            }
+                        })
+                    })
+//                    sourceClicked = [];
+//                    sourceClicked = sourceClicked.concat(sourceTemp);
+//                    sourceTemp = [];
                     $('#calendar').fullCalendar('addEventSource', sourceClicked);
+                    sourceRemove = [];
                 }
 
                 //Remove fMeeting from LocalStorage
@@ -593,7 +592,6 @@
                             });
                         }
                     })
-                    console.log("a2");
                     $('#calendar').fullCalendar( 'addEventSource', sourceClicked);
                 }
             } else {
@@ -756,19 +754,6 @@
                 });
 
         $('#calendar').fullCalendar('gotoDate', '2015-12-21');
-
-        $('#calendar').fullCalendar( 'addEventSource', [
-            {
-                title: 'CSC108\nLEC0101',
-                start: '2015-12-24T08:15:00',
-                end: '2015-12-24T10:15:00'
-            },
-            {
-                title: 'CSC108\nLEC0101',
-                start: '2015-12-22T08:15:00',
-                end: '2015-12-22T10:15:00'
-            }
-        ] );
 
         $('#calendar').fullCalendar('option', 'height', 760);
 
