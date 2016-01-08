@@ -485,11 +485,12 @@
                 if (courseIndex != -1) {
                     //Find index of fMeeting to be removed
                     var fMeetingIndex = -1;
-                    for (var e= 0; e < temp[courseIndex].selection.fMeetings ; e++) {
-                        if (temp[courseIndex].selection.fMeetings[e] == $meetingSelected) {
-                            fMeetingIndex = e;
+                    for (var i= 0; i < temp[courseIndex].selection.fMeetings.length ; i++) {
+                        if (temp[courseIndex].selection.fMeetings[i] == $meetingSelected) {
+                            fMeetingIndex = i;
                         }
                     }
+
                     if (fMeetingIndex != -1) {
                         temp[courseIndex].selection.fMeetings.splice(fMeetingIndex, 1);
                         localStorage[courseCode] = JSON.stringify(temp);
