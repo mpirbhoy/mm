@@ -78,6 +78,10 @@ MAIN - SEARCH SIDE BAR
     /*margin-bottom: 3px;*/
 }
 
+.fall .fc-axis.fc-widget-header, .winter .fc-axis.fc-widget-header{
+    color: #00cccc;
+}
+
 .navbar-brand {
     font-family: 'Montserrat', serif;
     font-size: 26px;
