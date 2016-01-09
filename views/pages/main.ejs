@@ -51,6 +51,42 @@
             alert("Your browser does not support Web Storage.\n (data is lost when the browser is closed.)");
         }
 
+        // Initiate fall calender
+        $('#calendar').fullCalendar(
+                {defaultView: 'agendaWeek',
+                    columnFormat: 'ddd',
+                    weekends: false,
+                    header:false,
+                    allDaySlot:false,
+                    minTime: '08:00:00',
+                    maxTime: '22:00:00',
+                    slotDuration: '00:15:00',
+                    slotLabelInterval: '01:00:00',
+                    slotEventOverlap: false
+                });
+
+        $('#calendar').fullCalendar('gotoDate', '2015-12-21');
+
+        $('#calendar').fullCalendar('option', 'height', 760);
+
+
+        // Initiate winter calender
+        $('#calendar2').fullCalendar(
+                {defaultView: 'agendaWeek',
+                    columnFormat: 'ddd',
+                    weekends: false,
+                    header:false,
+                    allDaySlot:false,
+                    minTime: '08:00:00',
+                    maxTime: '22:00:00',
+                    slotDuration: '00:15:00',
+                    slotLabelInterval: '01:00:00',
+                    slotEventOverlap: false
+                });
+
+        $('#calendar2').fullCalendar('gotoDate', '2015-12-21');
+        $('#calendar2').fullCalendar('option', 'height', 760);
+
         // Initiate search bar
         $(".select2").select2({
             placeholder: "Select courses",
@@ -309,10 +345,9 @@
             }
         });
 
-        var source = [];
         var sourceClicked = [];
         var sourceRemove = [];
-
+//        Add hover event handler
 //        $('body').on({
 //            mouseenter: function(){
 //                var $courseCode = $(this).closest('.panel').find('button').attr('value');
@@ -350,8 +385,6 @@
         // Add fixed meeting section on calendar
         $('body').on('click', '.fMeeting .content', function(e) {
             $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
-
-//            sourceClicked = [];
 
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
@@ -425,7 +458,6 @@
                             });
                         }
                     })
-//                    console.log(sourceClicked);
                     $('#calendar').fullCalendar('addEventSource', sourceClicked);
                 }
             } else {
@@ -433,6 +465,7 @@
                 $(this).removeClass('selected');
 
                 var $courseCode = $(this).closest('.panel').find('button').attr('value');
+                var raw1 = $(this).closest('.panel').find('button').text();
                 var text1 = raw1.substring(1);
                 var title = text1.substring(courseCode.length +1).trim();
                 var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
@@ -444,8 +477,6 @@
                     data.forEach(function (course) {
                         if (course.title === title) {
                             var sections = course.data.sections;
-//                            var fMeetingSelection = course.selection.fMeetings;
-//                            var vMeetingSelection = course.selection.vMeetings;
                             sections.forEach(function (section) {
                                 if (section.sectionCode === $sectionSelected) {
                                     var fixedMeetings = section.fixedMeetings;
@@ -462,7 +493,6 @@
                                                     courseName: title
                                                 });
                                             })
-                                            console.log(sourceRemove.length);
                                         };
                                     })
                                 }
@@ -472,15 +502,12 @@
                     sourceClicked.forEach(function(calendarObj, i) {
                         sourceRemove.forEach(function (removeObj){
                             if (calendarObj.id === removeObj.id &&
-                                    calendarObj.courseName === removeObj.courseName ||
+                                    calendarObj.courseName === removeObj.courseName &&
                                     calendarObj.title === removeObj.title) {
                                 sourceClicked.splice(i, 1);
                             }
                         })
                     })
-//                    sourceClicked = [];
-//                    sourceClicked = sourceClicked.concat(sourceTemp);
-//                    sourceTemp = [];
                     $('#calendar').fullCalendar('addEventSource', sourceClicked);
                     sourceRemove = [];
                 }
@@ -529,8 +556,7 @@
 
         // Add variable meeting section on calendar
         $('body').on('click', '.vMeeting .content', function(e) {
-//            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
-//            sourceClicked = [];
+            $('#calendar').fullCalendar( 'removeEventSource', sourceClicked);
 
             var $courseCode = $(this).closest('.panel').find('button').attr('value');
             var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
@@ -559,9 +585,9 @@
             // Hightlight the varyingMeeting
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
-                $this.closest('.panel-body').find(".vMeeting .content").each(function () {
-                    $(this).removeClass('selected');
-                });
+//                $this.closest('.panel-body').find(".vMeeting .content").each(function () {
+//                    $(this).removeClass('selected');
+//                });
                 $this.addClass('selected');
 
 
@@ -588,7 +614,8 @@
                                                     title: $courseCode + '\n' + vMeeting.type,
                                                     start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
                                                     end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
-                                                    color: '#4fd84a'
+                                                    color: '#4fd84a',
+                                                    courseName: title
                                                 });
                                             })
                                         }
@@ -602,7 +629,53 @@
             } else {
                 // Dehighlight the varingMeeting
                 $(this).removeClass('selected');
-                $('#calendar').fullCalendar('removeEventSource', sourceClicked);
+                var $courseCode = $(this).closest('.panel').find('button').attr('value');
+                var raw1 = $(this).closest('.panel').find('button').text();
+                var text1 = raw1.substring(1);
+                var title = text1.substring(courseCode.length +1).trim();
+                var $sectionSelected = $(this).parent().parent().prev().find('.selected').text();
+                var $meetingSelected = $(this).text();
+
+                if (localStorage.getItem($courseCode) === null) {
+                } else {
+                    var data = JSON.parse(localStorage.getItem($courseCode));
+                    data.forEach(function (course) {
+                        if (course.title === title) {
+                            var sections = course.data.sections;
+                            sections.forEach(function (section) {
+                                if (section.sectionCode === $sectionSelected) {
+                                    var varyingMeetings = section.varyingMeetings;
+                                    varyingMeetings.forEach(function (vMeeting) {
+                                        if (vMeeting.type === $meetingSelected) {
+                                            var meetingTime = vMeeting.timings;
+                                            meetingTime.forEach(function (time) {
+                                                sourceRemove.push({
+                                                    id: $courseCode,
+                                                    title: $courseCode + '\n' + vMeeting.type,
+                                                    start: convertDayToDate(time.day) + 'T' + (time.startTime.length > 4 ? time.startTime : 0 + time.startTime),
+                                                    end: convertDayToDate(time.day) + 'T' + (time.endTime.length > 4 ? time.endTime : 0 + time.endTime),
+                                                    color: '#4fd84a',
+                                                    courseName: title
+                                                });
+                                            });
+                                        };
+                                    })
+                                }
+                            });
+                        }
+                    })
+                    sourceClicked.forEach(function (calendarObj, i) {
+                        sourceRemove.forEach(function (removeObj) {
+                            if (calendarObj.id === removeObj.id &&
+                                    calendarObj.courseName === removeObj.courseName &&
+                                    calendarObj.title === removeObj.title) {
+                                sourceClicked.splice(i, 1);
+                            }
+                        })
+                    })
+                    $('#calendar').fullCalendar('addEventSource', sourceClicked);
+                    sourceRemove = [];
+                }
 
                 //Remove vMeeting from LocalStorage
                 if (courseIndex != -1) {
@@ -627,8 +700,8 @@
                     var sections = courseData.sections;
 
                     loadMsg = '<div class="panel panel-default">' +
-                            '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse"><div class="panel-body">';
+                            '<button data-toggle="collapse" data-target="#collapse' + loadCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                            '<div id="collapse' + loadCount + '" class="panel-collapse collapse"><div class="panel-body">';
                     loadMsg += courseData.note + "<br>";
 
                     if (courseData.prereqs) {
@@ -650,7 +723,7 @@
 
                     // section
                     var selectedSection = data.selection.section;
-                    $('#collapse' +  courseCount + ' .section .content').each(function ()  {
+                    $('#collapse' +  loadCount + ' .section .content').each(function ()  {
                         if ($(this).text() == selectedSection) {
                             $(this).trigger("click");
                         }
@@ -659,7 +732,7 @@
                     // fmeeting
                     var myFMeetings = data.selection.fMeetings;
 
-                    $('#collapse' + courseCount + ' .result .fMeeting .content').each(function() {
+                    $('#collapse' + loadCount + ' .result .fMeeting .content').each(function() {
                         for (var k = 0; k < myFMeetings.length; k++) {
                             if ($(this).text() == myFMeetings[k]){
                                 $(this).trigger("click");
@@ -668,7 +741,7 @@
                     })
 
                     var myVMeetings = data.selection.vMeetings;
-                    $('#collapse' + courseCount + ' .result .vMeeting .content').each(function() {
+                    $('#collapse' + loadCount + ' .result .vMeeting .content').each(function() {
                         for (var h = 0; h < myVMeetings.length; h++) {
                             if ($(this).text() == myVMeetings[h]){
                                 $(this).trigger("click");
@@ -676,7 +749,7 @@
                         }
                     })
 
-                    courseCount++;
+                    loadCount++;
                 });
             }
         }
@@ -730,55 +803,8 @@
 
             }
             $(this).closest('.panel').remove();
-//            $form = $(this).closest('form');
-//            $button = $(this).closest('button');
-//
-//            $.ajax({
-//                type: "DELETE",
-//                url: "/course/" + $(this).closest('button').attr('value'),
-//                success: function(data) {
-//                    window.location.reload();
-//                },
-//                fail: function() {
-//                }
-//            });
         })
 
-        // Initiate fall calender
-        $('#calendar').fullCalendar(
-                {defaultView: 'agendaWeek',
-                    columnFormat: 'ddd',
-                    weekends: false,
-                    header:false,
-                    allDaySlot:false,
-                    minTime: '08:00:00',
-                    maxTime: '22:00:00',
-                    slotDuration: '00:15:00',
-                    slotLabelInterval: '01:00:00',
-                    slotEventOverlap: false
-                });
-
-        $('#calendar').fullCalendar('gotoDate', '2015-12-21');
-
-        $('#calendar').fullCalendar('option', 'height', 760);
-
-
-        // Initiate winter calender
-        $('#calendar2').fullCalendar(
-                {defaultView: 'agendaWeek',
-                    columnFormat: 'ddd',
-                    weekends: false,
-                    header:false,
-                    allDaySlot:false,
-                    minTime: '08:00:00',
-                    maxTime: '22:00:00',
-                    slotDuration: '00:15:00',
-                    slotLabelInterval: '01:00:00',
-                    slotEventOverlap: false
-                });
-
-        $('#calendar2').fullCalendar('gotoDate', '2015-12-21');
-        $('#calendar2').fullCalendar('option', 'height', 760);
     });
 </script>
 </body>
