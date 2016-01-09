@@ -8,20 +8,25 @@ function getFixedVaryingMeetings(aCourse) {
     // <--For a section -->
     for (i = 0; i < aCourse.sections.length; i++) {
         var curSec = aCourse.sections[i];
+        var curSecMeetingCopy;
         curSec.fixedMeetings = null;
         curSec.varyingMeetings = null;
         // if number of section meeting = 0 and this section only has 1 catalog obj ->  its catalog are fixed meetings
         if (curSec.sectionMeetings.length == 0 && curSec.catalogs.length == 1) {
             curSec.fixedMeetings = [];
             curSec.varyingMeetings = [];
-            curSec.fixedMeetings.push(curSec.catalogs[0].meeting);
+            curSecMeetingCopy = JSON.parse(JSON.stringify(curSec.catalogs[0].meeting));
+            curSecMeetingCopy.catalogCode = curSec.catalogs[0].catalogCode;
+            curSec.fixedMeetings.push(curSecMeetingCopy);
         }
         // if number of section meeting = 0 and this section has > 1 catalog obj -> all its catalogs are varying meetings
         else if (curSec.sectionMeetings.length == 0 && curSec.catalogs.length > 0) {
             curSec.fixedMeetings = [];
             curSec.varyingMeetings = [];
             for (j = 0; j < curSec.catalogs.length; j++) {
-                curSec.varyingMeetings.push(curSec.catalogs[j].meeting);
+                curSecMeetingCopy = JSON.parse(JSON.stringify(curSec.catalogs[j].meeting));
+                curSecMeetingCopy.catalogCode = curSec.catalogs[j].catalogCode;
+                curSec.varyingMeetings.push(curSecMeetingCopy);
             }
         }
         // if number of section meeting > 0 -> all of them are fixed meetings and all catalog meeting are varying meetings
@@ -30,11 +35,14 @@ function getFixedVaryingMeetings(aCourse) {
             curSec.varyingMeetings = [];
             curSec.fixedMeetings = curSec.sectionMeetings;
             for (j = 0; j < curSec.catalogs.length; j++) {
-                curSec.varyingMeetings.push(curSec.catalogs[j].meeting);
+                curSecMeetingCopy = JSON.parse(JSON.stringify(curSec.catalogs[j].meeting));
+                curSecMeetingCopy.catalogCode = curSec.catalogs[j].catalogCode;
+                curSec.varyingMeetings.push(curSecMeetingCopy);
             }
         }
     }
 }
+
 module.exports = function (app) {
 
     app.get('/', function (req, res) {

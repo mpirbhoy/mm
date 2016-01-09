@@ -56,7 +56,6 @@
         // Initiate localStorage
         if (typeof(Storage) !== "undefined") {
             // Retrieve
-            console.log("localStorage working");
         } else {
             alert("Your browser does not support Web Storage.\n (data is lost when the browser is closed.)");
         }
@@ -98,8 +97,8 @@
         $('#calendar2').fullCalendar('option', 'height', 760);
 
         // Write fall/winter header to the calendar
-        $('.fall .fc-axis.fc-widget-header').html('Fall');
-        $('.winter .fc-axis.fc-widget-header').html('Winter');
+        $('.fall .fc-axis.fc-widget-header').html("<div class='pink'>Fall</div>");
+        $('.winter .fc-axis.fc-widget-header').html("<div class='blue'>Winter</div>");
 
         // Initiate search bar
         $(".select2").select2({
@@ -239,7 +238,14 @@
                         }
                         msg += "<div class='section'><span class='title'>SECTION: </span>";
                         sections.forEach(function (section) {
-                            msg += "<div  class='content'>" + section.sectionCode + "</div>";
+                            var term = section.term;
+                            if (term === 'F') {
+                                msg += "<div  class='content pink'>" + section.sectionCode + "</div>";
+                            } else if (term === 'W') {
+                                msg += "<div  class='content blue'>" + section.sectionCode + "</div>";
+                            } else if (term === 'Y') {
+                                msg += "<div  class='content orange'>" + section.sectionCode + "</div>";
+                            }
                         });
 //
 //                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
@@ -476,7 +482,6 @@
                                         if (fMeeting.type === $meetingSelected) {
                                             var meetingTime = fMeeting.timings;
                                             var term = section.term;
-                                            console.log("This is the term: " + term);
                                             meetingTime.forEach(function (time) {
                                                 sourceClicked.push({
                                                     id: $courseCode,
@@ -495,7 +500,6 @@
                         }
                     })
                     distributeByTerm(sourceClicked);
-                    console.log(sourceClicked.length);
                 }
             } else {
                 // Dehighlight the fixedMeeting
@@ -567,6 +571,8 @@
 
                 }
             }
+            var catalogNumbers = updateCatNums(courseCode, title);
+            $(this).closest('.panel-body').find('.catalog .number').html(catalogNumbers);
         });
 
         function convertDayToDate(day) {
@@ -625,7 +631,7 @@
             }
 
 
-                var $this = $(this);
+            var $this = $(this);
             // Hightlight the varyingMeeting
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
@@ -653,7 +659,6 @@
                                         if (vMeeting.type === $meetingSelected) {
                                             var meetingTime = vMeeting.timings;
                                             var term = section.term;
-                                            console.log("This is the term: " + term);
                                             meetingTime.forEach(function (time) {
                                                 sourceClicked.push({
                                                     id: $courseCode,
@@ -742,6 +747,8 @@
 
                 }
             }
+            var catalogNumbers = updateCatNums(courseCode, title);
+            $(this).closest('.panel-body').find('.catalog .number').html(catalogNumbers);
         });
 
         // Load all the courses on refresh
@@ -771,7 +778,14 @@
                     }
                     loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
                     sections.forEach(function (section) {
-                        loadMsg += "<div  class='content'>" + section.sectionCode + "</div>";
+                        var term = section.term;
+                        if (term === 'F') {
+                            loadMsg += "<div  class='content pink'>" + section.sectionCode + "</div>";
+                        } else if (term === 'W') {
+                            loadMsg += "<div  class='content blue'>" + section.sectionCode + "</div>";
+                        } else if (term === 'Y') {
+                            loadMsg += "<div  class='content orange'>" + section.sectionCode + "</div>";
+                        }
                     });
 
                     loadMsg += '</div>'
@@ -896,6 +910,67 @@
             });
             $('#calendar').fullCalendar( 'addEventSource', sourceClickedFall);
             $('#calendar2').fullCalendar( 'addEventSource', sourceClickedWinter);
+        }
+
+        // Return a string of catalog numbers given user input
+        function updateCatNums(courseCode, title) {
+
+
+            var data, selection, i, j, k, coursesFromCourseCode, courseInLS, targetedSection;
+            var selectedSectionCode, h, res, x, y, z;
+
+
+            // One courseCode could map to two courses (e.g. English and French)
+            coursesFromCourseCode = JSON.parse(localStorage[courseCode]);
+
+            //Find the course in the array
+            for (i = 0; i < coursesFromCourseCode.length; i++) {
+                if (coursesFromCourseCode[i].title == title) {
+                    courseInLS = coursesFromCourseCode[i];
+                }
+            }
+            //end find the course in the array
+
+            //localStorage's data and selection
+            data = courseInLS.data;
+            selection = courseInLS.selection;
+
+            //Find the section in data's sections
+            selectedSectionCode = selection.section; //e.g "A"
+            for (h = 0; h < data.sections.length; h++) {
+                if (data.sections[h].sectionCode == selectedSectionCode) {
+                    targetedSection = data.sections[h];
+                }
+            }
+            // end find the section in data's sections
+
+            // Loop thru each selected fixed meeting in selection
+            res = "";
+            for (k = 0; k < selection.fMeetings.length; k++) {
+                // In targeted section, go into its fixed meetings
+                // find the cat code by match the fixed meeting's type against selection's fixed meeting's type
+                for (j = 0; j < targetedSection.fixedMeetings.length; j++) {
+                    if (targetedSection.fixedMeetings[j].catalogCode && targetedSection.fixedMeetings[j].type == selection.fMeetings[k]) {
+                        res += targetedSection.fixedMeetings[j].catalogCode + "(" + targetedSection.fixedMeetings[j].type + ")\n";
+                    }
+                }
+            }
+
+            // Find cat codes from vMeetings
+            // loop fixed meetings, in order narrow down to which set of varying meetings
+            for (k = 0; k < selection.vMeetings.length; k++) {
+                // In targeted section, go into its varying meetings
+                // find the cat code by match the varying meeting's type against selection's varying meeting's type
+                for (j = 0; j < targetedSection.varyingMeetings.length; j++) {
+                    if (targetedSection.varyingMeetings[j].catalogCode && targetedSection.varyingMeetings[j].type == selection.vMeetings[k]) {
+                        res += targetedSection.varyingMeetings[j].catalogCode + "(" + targetedSection.varyingMeetings[j].type + ")\n";
+
+                    }
+                }
+
+
+            }
+            return res;
         }
 
     });

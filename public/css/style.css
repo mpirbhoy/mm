@@ -12,7 +12,18 @@ MAIN - SEARCH SIDE BAR
     background-color: #EEE;
     padding: 20px 0 5px 0;
 }
-@media (min-width: 768px) {
+
+.fc-time-grid-event {
+    /*padding: 7px;*/
+    font-size: 1.05em;
+    /*text-align: center;*/
+    /*vertical-align: middle;*/
+    display : flex;
+    align-items : center;
+    justify-content: center;
+}
+
+@media screen and (min-width: 768px) {
     .sidebar {
         position: fixed;
         top: 51px;
@@ -32,10 +43,23 @@ MAIN - SEARCH SIDE BAR
     }
 }
 
-@media (max-width: 768px) {
+@media screen and (max-width: 768px) {
     div .sidebar {
         padding-top: 60px;
-    }}
+    }
+
+    .fc-time-grid-event .fc-title{
+        font-size: 0.90em;
+    }
+
+    .col-lg-6 {
+        position: relative;
+        min-height: 1px;
+        padding-right: 2px;
+        padding-left: 2px;
+    }
+
+}
 
 .list-group-item {
     margin-bottom: 10px;
@@ -72,10 +96,20 @@ MAIN - SEARCH SIDE BAR
     padding: 0 15px 15px 15px;
 }
 
-.red {
+.blue {
     color: #00cccc;
     /*font-weight: bold;*/
     /*margin-bottom: 3px;*/
+}
+
+.pink {
+    color: hotpink;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: white;
+    padding: 15px 0px;
 }
 
 .fall .fc-axis.fc-widget-header, .winter .fc-axis.fc-widget-header{
@@ -107,9 +141,42 @@ MAIN - SEARCH SIDE BAR
     zoom: 1;
 }
 
+.content.blue {
+    border: 1px solid #00cccc;
+    color: #00cccc;
+}
+
+.content.pink {
+    border: 1px solid hotpink;
+    color: hotpink;
+}
+
+.content.orange {
+    border: 1px solid orange;
+    color: orange;
+}
+
 .section .content.selected, .fMeeting .content.selected, .vMeeting .content.selected {
     border: 1px solid green;
     background-color: green;
+    color: #fff;
+}
+
+.section .content.blue.selected, .fMeeting .content.blue.selected, .vMeeting .content.blue.selected {
+    border: 1px solid #00cccc;
+    background-color: #00cccc;
+    color: #fff;
+}
+
+.section .content.pink.selected, .fMeeting .content.pink.selected, .vMeeting .content.pink.selected {
+    border: 1px solid hotpink;
+    background-color: hotpink;
+    color: #fff;
+}
+
+.section .content.orange.selected, .fMeeting .content.orange.selected, .vMeeting .content.orange.selected {
+    border: 1px solid orange;
+    background-color: orange;
     color: #fff;
 }
 
@@ -144,15 +211,7 @@ button {
 
 .main {font-size: 11px;}
 
-.fc-time-grid-event {
-    /*padding: 7px;*/
-    font-size: 1.05em;
-    /*text-align: center;*/
-    /*vertical-align: middle;*/
-    display : flex;
-    align-items : center;
-    justify-content: center;
-}
+
 
 .select2-result-repository { padding-top: 4px; padding-bottom: 3px; }
 .select2-result-repository__avatar { float: left; width: 60px; margin-right: 10px; }
