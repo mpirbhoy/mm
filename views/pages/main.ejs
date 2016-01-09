@@ -226,41 +226,7 @@
 
                     var sections = data.sections;
                     if (data.status != 409 && !titleExists) {
-                        var msg = '<div class="panel panel-default">'+
-                                '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                                '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
-                        msg += data.note + "<br>";
-                        if (data.prereqs[0].length > 0) {
-                            msg += "<span class='title'> PRE: </span>" + data.prereqs[0] + "<br>";
-                        }
-                        if (data.exclusions[0].length > 0) {
-                            msg += "<span class='title'> EXC: </span>" + data.exclusions[0] + "<br>";
-                        }
-                        msg += "<div class='section'><span class='title'>SECTION: </span>";
-                        sections.forEach(function (section) {
-                            var term = section.term;
-                            if (term === 'F') {
-                                msg += "<div  class='content pink'>" + section.sectionCode + "</div>";
-                            } else if (term === 'W') {
-                                msg += "<div  class='content blue'>" + section.sectionCode + "</div>";
-                            } else if (term === 'Y') {
-                                msg += "<div  class='content orange'>" + section.sectionCode + "</div>";
-                            }
-                        });
-//
-//                        msg += "<div class='time' style='display:none;'>" + lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location + "</div>";
-//                        console.log(lec.timings[0].day + "/" + lec.timings[0].startTime + "/" + lec.timings[0].endTime + "/" + lec.timings[0].location);
-
-//                        var courseInst = JSON.parse(args).data['instructors'];
-//                        msg += "<span class='bold'> INSTR: </span>" + courseInst + "<br>";
-//                        msg += "<br><span class='bold'>MAIN: </span>LEC0501<br>"+
-//                                "<span class='bold'>SECONDARY: </span><div class='section'>LAB01</div><div class='section'>LAB02</div><div class='section'>LAB03</div><br>"+
-//                                "<span class='bold'>Catalog #:</span><br><br>" +
-//                                '<div class="progress" style="margin-top:5px"><div class="progress-bar" role="progressbar"aria-valuenow="33" aria-valuemin="0" aria-valuemax="100" style="width:40%"></div></div>';
-
-
-                        msg += '</div>'
-                        msg += '<div class="result"></div></div></div>';
+                        var msg = displayCourses(courseCode, courseName, data, sections, 'onSearch');
                         $('#courses').prepend(msg);
                         courseCount++;
                     }
@@ -764,31 +730,7 @@
                     var courseData = data.data;
                     var sections = courseData.sections;
 
-                    loadMsg = '<div class="panel panel-default">' +
-                            '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse"><div class="panel-body">';
-                    loadMsg += courseData.note + "<br>";
-
-                    if (courseData.prereqs) {
-                        loadMsg += "<span class='title'> PRE: </span>" + courseData.prereqs + "<br>";
-                    }
-                    if (courseData.exclusions) {
-                        loadMsg += "<span class='title'> EXC: </span>" + courseData.exclusions + "<br>";
-                    }
-                    loadMsg += "<div class='section'><span class='title'>SECTION: </span>";
-                    sections.forEach(function (section) {
-                        var term = section.term;
-                        if (term === 'F') {
-                            loadMsg += "<div  class='content pink'>" + section.sectionCode + "</div>";
-                        } else if (term === 'W') {
-                            loadMsg += "<div  class='content blue'>" + section.sectionCode + "</div>";
-                        } else if (term === 'Y') {
-                            loadMsg += "<div  class='content orange'>" + section.sectionCode + "</div>";
-                        }
-                    });
-
-                    loadMsg += '</div>'
-                    loadMsg += '<div class="result"></div></div></div>';
+                    loadMsg = displayCourses(courseCode, courseName, courseData, sections, 'onRefresh');
                     $('#courses').prepend(loadMsg);
 
                     // Generate click events for sections, fmeeting and vmeeting
@@ -970,6 +912,39 @@
 
             }
             return res;
+        }
+
+        function displayCourses(courseCode, courseName, data, sections, type) {
+            var msg = '<div class="panel panel-default">'+
+                    '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>';
+            if (type === 'onRefresh') {
+                msg += '<div id="collapse' + courseCount + '" class="panel-collapse collapse"><div class="panel-body">';
+            } else if (type === 'onSearch') {
+                msg += '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
+            }
+
+            msg += "<span class='title'> DESC: </span>" + "<div class='desc'>" + data.note + "</div>";
+            if (data.prereqs[0].length > 0) {
+                msg += "<span class='title'> PRE: </span>" + data.prereqs[0] + "<br>";
+            }
+            if (data.exclusions[0].length > 0) {
+                msg += "<span class='title'> EXC: </span>" + data.exclusions[0] + "<br>";
+            }
+            msg += "<div class='section'><span class='title'>SECTION: </span>";
+            sections.forEach(function (section) {
+                var term = section.term;
+                if (term === 'F') {
+                    msg += "<div  class='content pink'>" + section.sectionCode + "</div>";
+                } else if (term === 'W') {
+                    msg += "<div  class='content blue'>" + section.sectionCode + "</div>";
+                } else if (term === 'Y') {
+                    msg += "<div  class='content orange'>" + section.sectionCode + "</div>";
+                }
+            });
+
+            msg += '</div>'
+            msg += '<div class="result"></div></div></div>';
+            return msg;
         }
 
     });
