@@ -923,7 +923,7 @@
                 msg += '<div id="collapse' + courseCount + '" class="panel-collapse collapse in"><div class="panel-body">';
             }
 
-            msg += "<span class='title'> DESC: </span>" + "<div class='desc'>" + data.note + "</div>";
+            msg += "<span class='title'> DESC: </span>" + "<span class='desc'>" + data.note +  "<br></span>";
             if (data.prereqs[0].length > 0) {
                 msg += "<span class='title'> PRE: </span>" + data.prereqs[0] + "<br>";
             }
