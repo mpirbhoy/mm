@@ -753,7 +753,6 @@
 
         // Load all the courses on refresh
         localStorage['appVersion'] = "1.0";
-        var loadCount = 1;
         var loadMsg = "";
 
         if (localStorage['allCourses'] != null) {
@@ -766,8 +765,8 @@
                     var sections = courseData.sections;
 
                     loadMsg = '<div class="panel panel-default">' +
-                            '<button data-toggle="collapse" data-target="#collapse' + loadCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
-                            '<div id="collapse' + loadCount + '" class="panel-collapse collapse"><div class="panel-body">';
+                            '<button data-toggle="collapse" data-target="#collapse' + courseCount + '" class="list-group-item" value=' + courseCode + '><span id="close">x</span>' + courseCode + ': ' + courseName + '</button>' +
+                            '<div id="collapse' + courseCount + '" class="panel-collapse collapse"><div class="panel-body">';
                     loadMsg += courseData.note + "<br>";
 
                     if (courseData.prereqs) {
@@ -796,7 +795,7 @@
 
                     // section
                     var selectedSection = data.selection.section;
-                    $('#collapse' +  loadCount + ' .section .content').each(function ()  {
+                    $('#collapse' +  courseCount + ' .section .content').each(function ()  {
                         if ($(this).text() == selectedSection) {
                             $(this).trigger("click");
                         }
@@ -805,7 +804,7 @@
                     // fmeeting
                     var myFMeetings = data.selection.fMeetings;
 
-                    $('#collapse' + loadCount + ' .result .fMeeting .content').each(function() {
+                    $('#collapse' + courseCount + ' .result .fMeeting .content').each(function() {
                         for (var k = 0; k < myFMeetings.length; k++) {
                             if ($(this).text() == myFMeetings[k]){
                                 $(this).trigger("click");
@@ -814,7 +813,7 @@
                     })
 
                     var myVMeetings = data.selection.vMeetings;
-                    $('#collapse' + loadCount + ' .result .vMeeting .content').each(function() {
+                    $('#collapse' + courseCount + ' .result .vMeeting .content').each(function() {
                         for (var h = 0; h < myVMeetings.length; h++) {
                             if ($(this).text() == myVMeetings[h]){
                                 $(this).trigger("click");
@@ -822,7 +821,7 @@
                         }
                     })
 
-                    loadCount++;
+                    courseCount++;
                 });
             }
         }
