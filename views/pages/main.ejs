@@ -405,9 +405,9 @@
 
 //            Check if meeting Selected is already in the array
 
-            console.log(temp);
-            console.log(courseIndex);
-            console.log(temp[courseIndex].selection.fMeetings.length);
+//            console.log(temp);
+//            console.log(courseIndex);
+//            console.log(temp[courseIndex].selection.fMeetings.length);
             for (var ii = 0; ii < temp[courseIndex].selection.fMeetings.length; ii++ ) {
                 if (temp[courseIndex].selection.fMeetings[ii] == $meetingSelected) {
                     reloading = true;
@@ -568,20 +568,26 @@
             var title = text1.substring(courseCode.length +1).trim();
             var temp = JSON.parse(localStorage[courseCode]);
             var courseIndex = -1;
+            var reloading = false;
             for (var i = 0; i < temp.length; i++) {
                 if (temp[i].title == title) {
                     courseIndex = i;
                 }
             }
 
-            //Check if meeting Selected is already in the array
-//            for (var i = 0; i < temp[courseIndex].selection.vMeetings.length; i++ ) { //TODO temporarily comment out
-//                if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
-//                    courseIndex = -1;
-//                }
-//            }
+//            Check if meeting Selected is already in the array
 
-            var $this = $(this);
+//            console.log(temp);
+//            console.log(courseIndex);
+//            console.log(temp[courseIndex].selection.vMeetings.length);
+            for (var ii = 0; ii < temp[courseIndex].selection.vMeetings.length; ii++ ) {
+                if (temp[courseIndex].selection.vMeetings[ii] == $meetingSelected) {
+                    reloading = true;
+                }
+            }
+
+
+                var $this = $(this);
             // Hightlight the varyingMeeting
             if (!$this.hasClass('selected')) {
                 // remove all other active buttons
@@ -591,8 +597,8 @@
                 $this.addClass('selected');
 
 
-                if (courseIndex != -1) {
-                    temp[courseIndex].selection.vMeetings = [$meetingSelected];
+                if (courseIndex != -1 && !reloading) {
+                    temp[courseIndex].selection.vMeetings.push($meetingSelected);
                     localStorage[courseCode] = JSON.stringify(temp);
                 }
 
@@ -679,8 +685,20 @@
 
                 //Remove vMeeting from LocalStorage
                 if (courseIndex != -1) {
-                    temp[courseIndex].selection.vMeetings = [];
-                    localStorage[courseCode] = JSON.stringify(temp);
+                    //Find index of vMeeting to be removed
+                    var vMeetingIndex = -1;
+
+                    for (var i= 0; i < temp[courseIndex].selection.vMeetings.length ; i++) {
+                        if (temp[courseIndex].selection.vMeetings[i] == $meetingSelected) {
+                            vMeetingIndex = i;
+                        }
+                    }
+
+                    if (vMeetingIndex != -1) {
+                        temp[courseIndex].selection.vMeetings.splice(vMeetingIndex, 1);
+                        localStorage[courseCode] = JSON.stringify(temp);
+                    }
+
                 }
             }
         });
