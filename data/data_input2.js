@@ -151,12 +151,12 @@ function getCourseTitleInfo(inputString) {
 
 }
 function doStupidShit(callback) {
-//    allData.rows.forEach(function(value, i) {
-
-    //for (var i = 0; i < allData.rows.length; i++){
 
     //Checking if row has null on keys
-    if (!allData.rows[i][dataFields.COURSE_TITLE] || !allData.rows[i][dataFields.TERM_AND_SECTION] || !(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION] || allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION])) {
+    if (!allData.rows[i][dataFields.COURSE_TITLE] ||
+        !allData.rows[i][dataFields.TERM_AND_SECTION] ||
+        !(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION] ||
+        allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION])) {
         callback();
         return;
     }
@@ -164,18 +164,16 @@ function doStupidShit(callback) {
 
     // Conversions
     var arrayCourseTitleInfo = getCourseTitleInfo(allData.rows[i][dataFields.COURSE_TITLE]);
-    var varyingMeetingsInfo = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION], allData.rows[i][dataFields.VARY_MEETING_TYPE]);
+    var varyingMeetingsInfo = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION],
+        allData.rows[i][dataFields.VARY_MEETING_TYPE]);
 
 
     //Courses
-    //console.log('!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!111!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!');
-    //console.log(i);
-    var courseCode = arrayCourseTitleInfo.courseCode; //String
-    //console.log(courseCode);
-    var facultyCode = arrayCourseTitleInfo.facCode; //String
-    //console.log(facultyCode);
-    var courseName = arrayCourseTitleInfo.courseName;  //String
-    //console.log(courseName);
+    var courseCode = arrayCourseTitleInfo.courseCode;
+
+    var facultyCode = arrayCourseTitleInfo.facCode;
+
+    var courseName = arrayCourseTitleInfo.courseName;
 
 
 
@@ -214,23 +212,15 @@ function doStupidShit(callback) {
 
     //Sections
     var sectionCode = getSectionCode(allData.rows[i][dataFields.TERM_AND_SECTION]);
-    //console.log(sectionCode);
     var term = getTerm(allData.rows[i][dataFields.TERM_AND_SECTION]);
-    //console.log(term);
     var sectionDirector = getSectionDirector(allData.rows[i][dataFields.SECTION_DIRECTOR]);
-    //console.log(sectionDirector);
     var sectionInstructors = allData.rows[i][dataFields.REQ_MEETING_INSTRUCTOR];
-    //console.log(sectionInstructors);
     var sectionMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.REQ_MEETING_DAY_START_TIME_DURATION], allData.rows[i][dataFields.REQ_MEETING_TYPE]);
-    //console.log(sectionMeeting);
 
     //Catalogs
     var catalogCode = allData.rows[i][dataFields.CAT_NUM];
-    //console.log(catalogCode);
     var catalogInstructors = allData.rows[i][dataFields.VARY_MEETING_INSTRUCTOR];
-    //console.log(catalogInstructors);
     var catalogMeeting = getDayStarttimeDuration(allData.rows[i][dataFields.VARY_MEETING_DAY_START_TIME_DURATION], allData.rows[i][dataFields.VARY_MEETING_TYPE]);
-    //console.log(catalogMeeting);
 
     //If current row is not a catalog
     if (!allData.rows[i][dataFields.CAT_NUM]) {
