@@ -127,6 +127,10 @@ MAIN - SEARCH SIDE BAR
     border-color: #E7E7E7;
 }
 
+.navbar-right {
+    padding: 5px 5px;
+}
+
 
 .content {
     display: -moz-inline-stack;
@@ -180,9 +184,14 @@ MAIN - SEARCH SIDE BAR
     color: #fff;
 }
 
+a:hover, a:focus {
+    text-decoration: none;
+}
+
 button {
     line-height: 10px;
 }
+
 .fc-agendaWeek-view {
     width: 100%;
     margin-top: 20px;
