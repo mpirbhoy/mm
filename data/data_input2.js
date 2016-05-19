@@ -427,7 +427,9 @@ function doStupidShit(callback) {
         });
     }
 }
-module.exports = function () {
+module.exports = function (mongoose) {
+
+    mongoose.connection.db.dropDatabase();
 
     async.whilst(
         function () {
