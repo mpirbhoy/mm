@@ -36,7 +36,7 @@ require('./routes.js')(app);
 
 
 //Populate Data into Mongo
-require('./data/data_input2.js')(mongoose);
+//require('./data/data_input2.js')(mongoose);
 
 //Creating and querying the postgres database
 app.listen(app.get('port'), function() {
